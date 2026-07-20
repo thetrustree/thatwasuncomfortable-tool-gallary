@@ -207,6 +207,98 @@
       text-align: center;
     }
 
+    .gate {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(0, 0, 0, .72);
+    }
+
+    .gate.open {
+      display: flex;
+    }
+
+    .gate-panel {
+      width: min(420px, 100%);
+      border-radius: 8px;
+      border: 1px solid rgba(246, 242, 236, .16);
+      background: #111113;
+      box-shadow: var(--shadow);
+      padding: 22px;
+    }
+
+    .gate-panel h2 {
+      margin: 0 0 8px;
+      font-size: 22px;
+      letter-spacing: 0;
+    }
+
+    .gate-panel p {
+      margin: 0 0 18px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .gate-panel label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--steel);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .gate-panel input {
+      width: 100%;
+      min-height: 48px;
+      border-radius: 8px;
+      border: 1px solid rgba(246, 242, 236, .18);
+      background: #050505;
+      color: var(--text);
+      font: inherit;
+      font-size: 18px;
+      padding: 10px 12px;
+    }
+
+    .gate-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .gate button {
+      min-height: 42px;
+      border: 0;
+      border-radius: 8px;
+      padding: 0 14px;
+      color: #080809;
+      background: var(--text);
+      font: inherit;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .gate button.secondary {
+      color: var(--text);
+      background: transparent;
+      border: 1px solid rgba(246, 242, 236, .18);
+    }
+
+    .gate-error {
+      min-height: 20px;
+      margin-top: 10px;
+      color: var(--red-bright);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
     @media (max-width: 1040px) {
       .tool-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -272,7 +364,7 @@
       </div>
 
       <div class="tool-grid">
-        <a class="tool-card" href="https://armor.thatwasuncomfortable.com">
+        <a class="tool-card" data-locked-tool="true" href="https://armor.thatwasuncomfortable.com">
           <div>
             <span class="thumb"><img src="assets/armor-logo.png" alt=""></span>
             <h3>ARMOR Batting Order</h3>
@@ -281,7 +373,7 @@
           <span class="tool-meta"><span class="pill"><span class="dot"></span>Live</span><span>Open</span></span>
         </a>
 
-        <a class="tool-card" href="https://thetrustree.github.io/Atlantic-North-Plumbing-Batting-Order/">
+        <a class="tool-card" data-locked-tool="true" href="https://thetrustree.github.io/Atlantic-North-Plumbing-Batting-Order/">
           <div>
             <span class="thumb"><img src="assets/plumbing-logo.png" alt=""></span>
             <h3>Plumbing Batting Order</h3>
@@ -290,7 +382,7 @@
           <span class="tool-meta"><span class="pill"><span class="dot"></span>Live</span><span>Open</span></span>
         </a>
 
-        <a class="tool-card" href="https://thetrustree.github.io/Atlantic-North-Electrical-Batting-Order/">
+        <a class="tool-card" data-locked-tool="true" href="https://thetrustree.github.io/Atlantic-North-Electrical-Batting-Order/">
           <div>
             <span class="thumb"><img src="assets/electrical-logo.png" alt=""></span>
             <h3>Electrical Batting Order</h3>
@@ -299,13 +391,22 @@
           <span class="tool-meta"><span class="pill"><span class="dot"></span>Live</span><span>Open</span></span>
         </a>
 
-        <a class="tool-card" href="https://thetrustree.github.io/field-tools/">
+        <a class="tool-card" data-locked-tool="true" href="https://thetrustree.github.io/field-tools/">
           <div>
             <span class="thumb"><img src="assets/financing-logo.png" alt=""></span>
             <h3>Field Financing</h3>
             <p>Financing and loan guide for field conversations.</p>
           </div>
           <span class="tool-meta"><span class="pill"><span class="dot"></span>Live</span><span>Open</span></span>
+        </a>
+
+        <a class="tool-card" data-locked-tool="true" href="hvac-repair-replace.html">
+          <div>
+            <span class="thumb"><img src="assets/blue-tools-logo.png" alt=""></span>
+            <h3>HVAC Cost Review</h3>
+            <p>Repair, replacement, operating cost, and payment review for homeowners.</p>
+          </div>
+          <span class="tool-meta"><span class="pill"><span class="dot"></span>Ready</span><span>Open</span></span>
         </a>
 
         <a class="tool-card" href="https://substack.com/@uncletoddlongbrake">
@@ -323,5 +424,75 @@
       That Was Uncomfortable field tools.
     </footer>
   </main>
+
+  <div class="gate" id="toolGate" aria-hidden="true">
+    <form class="gate-panel" id="toolGateForm">
+      <h2>Team Tools</h2>
+      <p>Enter the team passcode to open this tool.</p>
+      <label for="toolPasscode">Passcode</label>
+      <input id="toolPasscode" type="password" autocomplete="current-password">
+      <div class="gate-actions">
+        <button class="secondary" type="button" id="toolGateCancel">Cancel</button>
+        <button type="submit">Open Tool</button>
+      </div>
+      <div class="gate-error" id="toolGateError" aria-live="polite"></div>
+    </form>
+  </div>
+
+  <script>
+    const TEAM_TOOL_PASSCODE = "teamtools";
+    const TOOL_UNLOCK_KEY = "thatwasuncomfortable-tools-unlocked";
+    let pendingToolHref = "";
+
+    const toolGate = document.getElementById("toolGate");
+    const toolGateForm = document.getElementById("toolGateForm");
+    const toolPasscode = document.getElementById("toolPasscode");
+    const toolGateError = document.getElementById("toolGateError");
+    const toolGateCancel = document.getElementById("toolGateCancel");
+
+    function isToolUnlocked() {
+      return window.sessionStorage.getItem(TOOL_UNLOCK_KEY) === "yes";
+    }
+
+    function openToolGate(href) {
+      pendingToolHref = href;
+      toolGate.classList.add("open");
+      toolGate.setAttribute("aria-hidden", "false");
+      toolPasscode.value = "";
+      toolGateError.textContent = "";
+      window.setTimeout(() => toolPasscode.focus(), 20);
+    }
+
+    function closeToolGate() {
+      toolGate.classList.remove("open");
+      toolGate.setAttribute("aria-hidden", "true");
+      pendingToolHref = "";
+    }
+
+    document.querySelectorAll("[data-locked-tool='true']").forEach(card => {
+      card.addEventListener("click", event => {
+        if (isToolUnlocked()) return;
+        event.preventDefault();
+        openToolGate(card.href);
+      });
+    });
+
+    toolGateForm.addEventListener("submit", event => {
+      event.preventDefault();
+      if (toolPasscode.value.trim() !== TEAM_TOOL_PASSCODE) {
+        toolGateError.textContent = "That passcode did not work.";
+        toolPasscode.select();
+        return;
+      }
+      window.sessionStorage.setItem(TOOL_UNLOCK_KEY, "yes");
+      window.location.href = pendingToolHref;
+    });
+
+    toolGateCancel.addEventListener("click", closeToolGate);
+
+    toolGate.addEventListener("click", event => {
+      if (event.target === toolGate) closeToolGate();
+    });
+  </script>
 </body>
 </html>

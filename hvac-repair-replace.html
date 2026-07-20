@@ -1,0 +1,2477 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071923">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="HVAC True Cost">
+  <link rel="icon" href="assets/blue-tools-logo.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/blue-tools-logo.png">
+  <title>HVAC System Cost Review</title>
+  <style>
+    :root {
+      --navy: #071923;
+      --navy-2: #0d3447;
+      --blue: #0e76ad;
+      --blue-soft: #e5f4fb;
+      --green: #178761;
+      --gold: #d78b1f;
+      --red: #b64a38;
+      --ink: #132c3b;
+      --muted: #657b88;
+      --line: #cbdde6;
+      --panel: rgba(255, 255, 255, .94);
+      --page: #edf6fa;
+      --white: #ffffff;
+      --shadow: 0 14px 34px rgba(3, 20, 33, .14);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 0%, rgba(14, 118, 173, .22), transparent 28rem),
+        radial-gradient(circle at 88% 4%, rgba(23, 135, 97, .14), transparent 24rem),
+        linear-gradient(180deg, #f7fcff 0, var(--page) 46%, #e7f0f4 100%);
+      font: 16px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    input, select, textarea { color: var(--ink); }
+
+    .app {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 56px;
+    }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: center;
+      padding: 22px 24px;
+      color: var(--white);
+      border-radius: 22px;
+      background:
+        linear-gradient(110deg, rgba(255,255,255,.05), transparent 36%),
+        linear-gradient(135deg, #03131c, var(--navy-2));
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      min-width: 0;
+    }
+
+    .brand-logo {
+      width: 92px;
+      height: 92px;
+      flex: 0 0 auto;
+      object-fit: contain;
+      filter: drop-shadow(0 8px 12px rgba(0, 0, 0, .3));
+    }
+
+    .eyebrow {
+      margin: 0 0 5px;
+      color: #9ed6ef;
+      font-size: .78rem;
+      font-weight: 850;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.7rem, 4vw, 2.8rem);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .hero p:last-child {
+      margin: 8px 0 0;
+      color: #d9e9ef;
+      max-width: 680px;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      border: 1px solid transparent;
+      border-radius: 12px;
+      padding: 10px 14px;
+      color: var(--navy);
+      background: var(--white);
+      font-weight: 800;
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(8, 27, 44, .16);
+    }
+
+    .btn.primary { background: var(--blue); color: var(--white); }
+    .btn.soft { background: var(--blue-soft); color: var(--navy); border-color: #b8dbe9; }
+    .btn.ghost { background: transparent; color: var(--white); border-color: rgba(255,255,255,.36); }
+    .btn.small { padding: 7px 10px; font-size: .86rem; border-radius: 9px; }
+    .btn.icon { width: 42px; height: 42px; padding: 0; display: grid; place-items: center; font-size: 1.1rem; }
+
+    .quick-edit, .details, .option-card, .drawer {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--panel);
+      box-shadow: 0 7px 20px rgba(16, 42, 67, .06);
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin: 18px 0;
+      padding: 6px;
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      background: rgba(255,255,255,.78);
+      box-shadow: 0 7px 20px rgba(16, 42, 67, .06);
+    }
+
+    .tabs button {
+      padding: 13px 16px;
+      border: 0;
+      border-radius: 12px;
+      color: var(--muted);
+      background: transparent;
+      font-weight: 850;
+    }
+
+    .tabs button[aria-selected="true"] {
+      color: var(--white);
+      background: var(--navy);
+      box-shadow: 0 5px 12px rgba(16, 42, 67, .2);
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .quick-edit {
+      margin: 18px 0;
+      padding: 16px;
+    }
+
+    .details h2, .drawer h2 {
+      margin: 0;
+      color: var(--navy);
+      font-size: 1.05rem;
+    }
+
+    label.field {
+      display: grid;
+      gap: 5px;
+      min-width: 0;
+    }
+
+    .field span, .range-head span, .check-label {
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 850;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .input-wrap {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--white);
+      overflow: hidden;
+    }
+
+    .input-wrap b {
+      padding-left: 10px;
+      color: var(--muted);
+      font-weight: 850;
+    }
+
+    .input-wrap input {
+      width: 100%;
+      min-width: 0;
+      border: 0;
+      outline: 0;
+      padding: 10px;
+      background: transparent;
+      font-weight: 800;
+    }
+
+    .select, textarea, .plain-input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--white);
+      padding: 10px;
+      font-size: .94rem;
+      font-weight: 450;
+    }
+
+    .select { font-weight: 650; }
+
+    .equipment-rating-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .equipment-rating-grid .select {
+      min-height: 50px;
+      width: 100%;
+      font-size: .94rem;
+      font-weight: 650;
+    }
+
+    .readonly-value {
+      min-height: 45px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(255,255,255,.72);
+      padding: 10px;
+      color: var(--navy);
+      font-weight: 900;
+    }
+
+    textarea { min-height: 74px; resize: vertical; }
+
+    .range-field {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .range-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: baseline;
+    }
+
+    .range-value {
+      color: var(--navy);
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    input[type="range"] { width: 100%; accent-color: var(--blue); }
+
+    .conversation-summary {
+      margin: 0 0 14px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-left: 5px solid var(--blue);
+      border-radius: 16px;
+      color: var(--ink);
+      background: rgba(255,255,255,.86);
+      box-shadow: 0 7px 20px rgba(16, 42, 67, .05);
+      font-weight: 450;
+    }
+
+    .finding-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .finding-grid textarea {
+      min-height: 66px;
+      font-size: .94rem;
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      align-items: start;
+    }
+
+    .options.replacement-only {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .finance-grid {
+      display: grid;
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .finance-section {
+      border: 1px solid var(--line);
+      border-top: 4px solid var(--blue);
+      border-radius: 16px;
+      background: rgba(255,255,255,.76);
+      overflow: hidden;
+    }
+
+    .finance-section.repair { border-top-color: var(--red); }
+    .finance-section.replacement { border-top-color: var(--green); }
+
+    .finance-section h3 {
+      margin: 0;
+      padding: 13px 14px;
+      color: var(--navy);
+      border-bottom: 1px solid var(--line);
+      font-size: 1rem;
+    }
+
+    .finance-row {
+      display: grid;
+      grid-template-columns: minmax(180px, 1.35fr) minmax(90px, .65fr) minmax(100px, .65fr) minmax(180px, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(203, 221, 230, .78);
+    }
+
+    .finance-row:last-child { border-bottom: 0; }
+
+    .finance-name {
+      display: grid;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .finance-name strong {
+      color: var(--navy);
+    }
+
+    .finance-name span {
+      color: var(--muted);
+      font-size: .84rem;
+    }
+
+    .finance-value {
+      display: grid;
+      gap: 2px;
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 850;
+      text-transform: uppercase;
+    }
+
+    .finance-value strong {
+      color: var(--navy);
+      font-size: 1rem;
+      text-transform: none;
+      white-space: nowrap;
+    }
+
+    .finance-plan {
+      color: var(--muted);
+      font-size: .86rem;
+      font-weight: 750;
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .option-card {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .option-card.best { border-top: 5px solid var(--green); }
+    .option-card.better { border-top: 5px solid var(--blue); }
+    .option-card.basic { border-top: 5px solid var(--gold); }
+    .option-card.repair { border-top: 5px solid var(--red); }
+
+    .card-main { padding: 16px; }
+
+    .badges {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      min-height: 25px;
+      margin-bottom: 8px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 4px 8px;
+      color: var(--white);
+      background: var(--navy);
+      font-size: .68rem;
+      font-weight: 900;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .badge.cost { background: var(--green); }
+    .badge.monthly { background: var(--blue); }
+
+    .repair-levels {
+      display: grid;
+      gap: 7px;
+      margin: 10px 0 12px;
+    }
+
+    .repair-levels button {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 8px 10px;
+      color: var(--navy);
+      background: var(--white);
+      font-size: .86rem;
+      font-weight: 850;
+      text-align: left;
+    }
+
+    .repair-levels button[aria-pressed="true"] {
+      border-color: var(--red);
+      background: #fff0ec;
+      box-shadow: inset 0 0 0 1px rgba(182, 74, 56, .18);
+    }
+
+    .repair-levels small {
+      color: var(--muted);
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .option-title {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .option-title h2 {
+      margin: 0;
+      color: var(--navy);
+      font-size: 1.25rem;
+    }
+
+    .description {
+      min-height: 42px;
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: .92rem;
+    }
+
+    .payment-block {
+      display: grid;
+      gap: 2px;
+      margin: 12px 0;
+      padding: 13px;
+      border-radius: 14px;
+      background: var(--navy);
+      color: var(--white);
+    }
+
+    .payment-label {
+      color: #a9d9ed;
+      font-size: .72rem;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .payment-value {
+      font-size: 2.45rem;
+      line-height: 1;
+      font-weight: 950;
+    }
+
+    .payment-value span {
+      font-size: .9rem;
+      color: #cfe4ed;
+      font-weight: 750;
+    }
+
+    .monthly-view {
+      display: grid;
+      gap: 7px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: baseline;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .row strong {
+      color: var(--navy);
+      white-space: nowrap;
+    }
+
+    .monthly-total {
+      margin-top: 4px;
+      padding: 10px 0 0;
+      border-top: 1px solid var(--line);
+      color: var(--navy);
+      font-weight: 900;
+    }
+
+    .monthly-total strong { font-size: 1.25rem; }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 13px;
+    }
+
+    .math {
+      display: none;
+      padding: 0 16px 16px;
+    }
+
+    .option-card.open .math { display: block; }
+
+    .math-box {
+      border-top: 1px solid var(--line);
+      padding-top: 13px;
+    }
+
+    .math h3 {
+      margin: 0 0 9px;
+      color: var(--navy);
+      font-size: .98rem;
+    }
+
+    .math .row {
+      padding: 5px 0;
+      border-bottom: 1px dashed rgba(101, 123, 136, .28);
+    }
+
+    .details {
+      margin-top: 0;
+      overflow: hidden;
+    }
+
+    .solution-setup {
+      margin-top: 18px;
+    }
+
+    .details-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .detail-sections {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .detail-section {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-top: 4px solid var(--blue);
+      border-radius: 16px;
+      background: rgba(255,255,255,.7);
+    }
+
+    .detail-section.planning { border-top-color: var(--blue); background: linear-gradient(180deg, rgba(229, 244, 251, .72), rgba(255,255,255,.76)); }
+    .detail-section.repair { border-top-color: var(--red); background: linear-gradient(180deg, rgba(255, 240, 236, .72), rgba(255,255,255,.76)); }
+    .detail-section.prices { border-top-color: var(--green); background: linear-gradient(180deg, rgba(229, 248, 240, .72), rgba(255,255,255,.76)); }
+    .detail-section.finance { border-top-color: var(--gold); background: linear-gradient(180deg, rgba(255, 247, 228, .72), rgba(255,255,255,.76)); }
+    .detail-section.utility { border-top-color: var(--blue); background: linear-gradient(180deg, rgba(229, 244, 251, .72), rgba(255,255,255,.76)); }
+    .detail-section.savings { border-top-color: var(--green); background: linear-gradient(180deg, rgba(229, 248, 240, .72), rgba(255,255,255,.76)); }
+    .detail-section.inflation { border-top-color: var(--gold); background: linear-gradient(180deg, rgba(255, 247, 228, .72), rgba(255,255,255,.76)); }
+
+    .operating-grid .climate-section { grid-column: 1; grid-row: 1; }
+    .operating-grid .utility-section { grid-column: 1; grid-row: 2; }
+    .operating-grid .savings-section { grid-column: 2; grid-row: 1 / span 2; }
+
+    .detail-section h3 {
+      margin: 0;
+      color: var(--navy);
+      font-size: 1rem;
+    }
+
+    .center-title {
+      text-align: center;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .full { grid-column: 1 / -1; }
+
+    .note {
+      color: var(--muted);
+      font-size: .88rem;
+    }
+
+    .calc-note {
+      display: grid;
+      gap: 7px;
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--blue-soft);
+    }
+
+    .calc-note .row {
+      font-size: .88rem;
+    }
+
+    .operating-snapshot {
+      display: grid;
+      gap: 8px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--blue-soft);
+    }
+
+    .operating-snapshot .row {
+      font-size: .9rem;
+    }
+
+    .source-card {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: center;
+      margin: 0 16px 16px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-left: 5px solid var(--green);
+      border-radius: 16px;
+      background: rgba(255,255,255,.82);
+    }
+
+    .source-card h3 {
+      margin: 0 0 6px;
+      color: var(--navy);
+      font-size: 1rem;
+    }
+
+    .source-card p {
+      margin: 0;
+    }
+
+    .source-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .source-links a {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 10px;
+      color: var(--navy);
+      background: var(--white);
+      font-size: .84rem;
+      font-weight: 850;
+      text-decoration: none;
+    }
+
+    .qr-block {
+      display: grid;
+      justify-items: center;
+      gap: 6px;
+      min-width: 116px;
+      color: var(--muted);
+      font-size: .75rem;
+      font-weight: 850;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .qr-block img {
+      width: 108px;
+      height: 108px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--white);
+      padding: 6px;
+    }
+
+    .drawer {
+      display: none;
+      margin-top: 14px;
+      padding: 16px;
+    }
+
+    .drawer.open { display: block; }
+
+    .drawer-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .advanced {
+      margin-top: 12px;
+      text-align: right;
+    }
+
+    .file-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .hidden-file {
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      overflow: hidden;
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .is-hidden { display: none !important; }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      max-width: calc(100% - 28px);
+      padding: 10px 14px;
+      border-radius: 999px;
+      color: var(--white);
+      background: var(--navy);
+      box-shadow: var(--shadow);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease;
+      z-index: 20;
+      font-weight: 850;
+    }
+
+    .toast.show { opacity: 1; }
+
+    .print-summary {
+      display: none;
+    }
+
+    .print-summary h2,
+    .print-summary h3,
+    .print-summary p {
+      margin: 0;
+    }
+
+    .print-card {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      background: var(--white);
+    }
+
+    .print-grid {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 12px;
+    }
+
+    .print-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .9rem;
+    }
+
+    .print-table th,
+    .print-table td {
+      padding: 8px 7px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .print-table th {
+      color: var(--muted);
+      font-size: .72rem;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 1040px) {
+      .options, .finance-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .options.replacement-only { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 760px) {
+      .app { width: min(100% - 18px, 1220px); padding-top: 10px; }
+      .hero { align-items: flex-start; padding: 18px; border-radius: 18px; }
+      .brand { gap: 12px; align-items: flex-start; }
+      .brand-logo { width: 72px; height: 72px; }
+      .hero-actions { align-self: flex-start; }
+      .tabs { grid-template-columns: 1fr; }
+      .finding-grid { grid-template-columns: 1fr; }
+      .options, .finance-grid, .detail-sections, .drawer-grid { grid-template-columns: 1fr; }
+      .finance-row { grid-template-columns: 1fr 1fr; }
+      .finance-name, .finance-plan { grid-column: 1 / -1; }
+      .source-card { grid-template-columns: 1fr; }
+      .qr-block { justify-items: start; text-align: left; }
+      .operating-grid .climate-section,
+      .operating-grid .utility-section,
+      .operating-grid .savings-section {
+        grid-column: auto;
+        grid-row: auto;
+      }
+      .detail-grid { grid-template-columns: 1fr; }
+      .equipment-rating-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 560px) {
+      .hero { display: grid; }
+      .hero-actions { justify-content: flex-start; }
+      .payment-value { font-size: 2.1rem; }
+      .details-head { display: grid; }
+    }
+
+    @media print {
+      @page { size: letter; margin: .35in; }
+
+      * {
+        box-shadow: none !important;
+        text-shadow: none !important;
+      }
+
+      html,
+      body {
+        background: #fff !important;
+        color: #102334 !important;
+      }
+
+      .app {
+        width: 100%;
+        max-width: none;
+        padding: 0;
+      }
+
+      .hero,
+      .drawer,
+      .tabs,
+      .tab-panel,
+      .advanced,
+      .toast {
+        display: none !important;
+      }
+
+      .print-summary {
+        display: grid !important;
+        gap: 10px;
+        font-size: 10.5pt;
+      }
+
+      .print-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        border-bottom: 2px solid #102334;
+        padding-bottom: 8px;
+      }
+
+      .print-brand {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .print-brand img {
+        width: 46px;
+        height: 46px;
+        object-fit: contain;
+      }
+
+      .print-summary h2 {
+        font-size: 18pt;
+        line-height: 1.05;
+      }
+
+      .print-summary h3 {
+        margin-bottom: 5px;
+        font-size: 10.5pt;
+      }
+
+      .print-card {
+        padding: 8px 10px;
+        border-radius: 8px;
+        break-inside: avoid;
+      }
+
+      .print-card .row {
+        padding: 2px 0;
+        font-size: 9.5pt;
+      }
+
+      .print-card p + p {
+        margin-top: 4px;
+      }
+
+      .print-grid {
+        grid-template-columns: 1.25fr .75fr;
+        gap: 10px;
+      }
+
+      .print-table {
+        font-size: 9.5pt;
+      }
+
+      .print-table th,
+      .print-table td {
+        padding: 5px 6px;
+      }
+
+      .print-small {
+        color: #526b7d;
+        font-size: 8.5pt;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="hero">
+      <div class="brand">
+        <img class="brand-logo" id="brandLogo" src="assets/blue-tools-logo.png" alt="">
+        <div>
+          <p class="eyebrow" id="brandName">Atlantic North</p>
+          <h1>HVAC System Cost Review</h1>
+          <p>Review repair, operating cost, future repairs, replacement options, and payment options in one simple view.</p>
+        </div>
+      </div>
+      <div class="hero-actions">
+        <button class="btn ghost small" type="button" id="resetBtn">Reset numbers</button>
+        <button class="btn icon" type="button" id="brandBtn" aria-label="Brand settings">⚙</button>
+      </div>
+    </section>
+
+    <section class="drawer" id="brandDrawer" aria-label="Brand settings">
+      <h2>Brand Settings</h2>
+      <div class="drawer-grid">
+        <label class="field">
+          <span>Company name</span>
+          <input class="plain-input" data-brand="name" type="text">
+        </label>
+        <label class="field">
+          <span>Logo URL</span>
+          <input class="plain-input" data-brand="logoUrl" type="url" placeholder="https://...">
+        </label>
+        <div class="field full">
+          <span>Local logo</span>
+          <div class="file-row">
+            <button class="btn soft small" type="button" id="chooseLogoBtn">Choose logo</button>
+            <button class="btn soft small" type="button" id="clearLogoBtn">Clear local logo</button>
+            <input class="hidden-file" id="logoFile" type="file" accept="image/*">
+            <span class="note">Saved only in this browser.</span>
+          </div>
+        </div>
+      </div>
+      <h2 style="margin-top:16px;">Testing</h2>
+      <div class="drawer-grid">
+        <button class="btn soft" type="button" id="printBtn">Print homeowner view</button>
+        <button class="btn soft" type="button" id="copySummaryBtn">Copy summary</button>
+      </div>
+      <h2 style="margin-top:16px;">Testing Presets</h2>
+      <div class="drawer-grid">
+        <button class="btn soft" type="button" data-scenario="repair">No-cooling repair call</button>
+        <button class="btn soft" type="button" data-scenario="replacement">Replacement-only call</button>
+        <button class="btn soft" type="button" data-scenario="older">Older system / poor maintenance</button>
+      </div>
+      <p class="note">Use these before field testing to quickly check the Discovery, Operating Cost, Solutions, and Payment Options flow.</p>
+      <h2 style="margin-top:16px;">Field Test Checks</h2>
+      <div class="calc-note">
+        <div class="row"><span>iPad layout</span><strong>No overlap or awkward wrapping</strong></div>
+        <div class="row"><span>Replacement-only mode</span><strong>Repair sections hidden</strong></div>
+        <div class="row"><span>Payment math</span><strong>Matches selected plans</strong></div>
+        <div class="row"><span>Language</span><strong>Clear and not pushy</strong></div>
+      </div>
+      <p class="note">Print/share and testing tools are intentionally kept behind the gear.</p>
+    </section>
+
+    <nav class="tabs" aria-label="Tool steps">
+      <button type="button" data-tab="details" aria-selected="true">Discovery</button>
+      <button type="button" data-tab="operating" aria-selected="false">Operating Cost</button>
+      <button type="button" data-tab="solutions" aria-selected="false">Solutions</button>
+      <button type="button" data-tab="financing" aria-selected="false">Payment Options</button>
+    </nav>
+
+    <section class="tab-panel active" id="detailsTab">
+      <section class="details" id="detailsPanel">
+        <div class="details-head">
+          <div>
+            <h2>Discovery</h2>
+            <p class="note">Enter what the homeowner called for, what was found, and the planning details.</p>
+          </div>
+          <button class="btn primary small" type="button" data-tab-jump="operating">Next: operating cost</button>
+        </div>
+        <div class="detail-sections">
+        <section class="detail-section planning">
+          <h3 class="center-title">Planning Window</h3>
+          <div class="range-field">
+            <div class="range-head"><span>A/C age</span><strong class="range-value" id="acAgeValue"></strong></div>
+            <input data-input="acAge" type="range" min="0" max="40" step="1">
+          </div>
+          <div class="range-field">
+            <div class="range-head"><span>Furnace age</span><strong class="range-value" id="furnaceAgeValue"></strong></div>
+            <input data-input="furnaceAge" type="range" min="0" max="40" step="1">
+          </div>
+          <div class="detail-grid equipment-rating-grid">
+            <label class="field">
+              <span>Fuel type</span>
+              <select class="select" data-input="fuelType">
+                <option value="gas">Gas</option>
+                <option value="electric">Electric</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>A/C installed SEER</span>
+              <select class="select" data-input="acInstalledSeer">
+                <option value="8">8 SEER</option>
+                <option value="10">10 SEER</option>
+                <option value="12">12 SEER</option>
+                <option value="13">13 SEER</option>
+                <option value="14">14 SEER</option>
+                <option value="14.3">14.3 SEER2</option>
+                <option value="15">15 SEER</option>
+                <option value="16">16 SEER</option>
+                <option value="18">18 SEER</option>
+                <option value="20">20 SEER</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Furnace installed AFUE</span>
+              <select class="select" data-input="furnaceEfficiency">
+                <option value="80">80% AFUE</option>
+                <option value="90">90% AFUE</option>
+                <option value="92">92% AFUE</option>
+                <option value="95">95% AFUE</option>
+                <option value="96">96% AFUE</option>
+                <option value="98">98% AFUE</option>
+              </select>
+            </label>
+          </div>
+          <div class="note">AFUE applies to gas furnaces. For electric heat, the tool uses electric as the heating fuel source.</div>
+          <div class="note" id="efficiencyNote"></div>
+          <div class="calc-note" aria-label="Current performance estimate">
+            <div class="row"><span>A/C installed rating</span><strong id="acInstalledRatingValue"></strong></div>
+            <div class="row"><span>A/C age adjustment</span><strong id="acPerformanceLossValue"></strong></div>
+            <div class="row"><span>A/C current working estimate</span><strong id="acCurrentPerformanceValue"></strong></div>
+            <div class="row"><span>Furnace installed rating</span><strong id="furnaceInstalledRatingValue"></strong></div>
+            <div class="row"><span>Furnace age adjustment</span><strong id="furnacePerformanceLossValue"></strong></div>
+            <div class="row"><span>Furnace current working estimate</span><strong id="furnaceCurrentPerformanceValue"></strong></div>
+          </div>
+          <div class="note">These are planning estimates based on equipment age and selected furnace rating. They are not lab-tested efficiency ratings.</div>
+          <div class="range-field">
+            <div class="range-head"><span>Owned this home</span><strong class="range-value" id="ownedHomeYearsValue"></strong></div>
+            <input data-input="ownedHomeYears" type="range" min="0" max="50" step="1">
+          </div>
+          <div class="note">How long the homeowner has owned the home. This helps frame what they know about maintenance history and past repairs.</div>
+          <label class="field">
+            <span>Maintenance history</span>
+            <select class="select" data-input="maintenanceHistory">
+              <option value="recent">Maintained within the last year</option>
+              <option value="oneTwo">Maintained 1-2 years ago</option>
+              <option value="threeFive">Maintained 3-5 years ago</option>
+              <option value="overFive">No maintenance in over 5 years</option>
+              <option value="unknown">Not sure</option>
+            </select>
+          </label>
+          <div class="note" id="maintenanceHistoryNote"></div>
+          <div class="range-field">
+            <div class="range-head"><span>Planning to stay</span><strong class="range-value" id="yearsDetailValue"></strong></div>
+            <input data-input="yearsInHome" type="range" min="1" max="99" step="1">
+          </div>
+          <div class="note">How many more years the homeowner expects to live here. This sets the window for repair risk, savings, and future replacement cost.</div>
+          <div class="note">For planning purposes, systems over 20 years old are estimated to average about one repair per year. This is a conservative estimate, not a promise.</div>
+        </section>
+
+        <section class="detail-section repair">
+          <h3 class="center-title">Repair Window</h3>
+          <label class="field">
+            <span>Conversation type</span>
+            <select class="select" data-input="conversationType">
+              <option value="repair">Repair comparison</option>
+              <option value="replacement">Replacement options only</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>What you called for</span>
+            <input class="plain-input" data-input="calledFor" type="text" placeholder="No heat, no cooling, noise, leak...">
+          </label>
+          <label class="field">
+            <span>What we found</span>
+            <textarea data-input="foundIssue" placeholder="Failed capacitor, dirty blower wheel, pitted contactor..."></textarea>
+          </label>
+          <label class="field repair-only">
+            <span>Current repair</span>
+            <output class="readonly-value" id="selectedRepairCostValue"></output>
+          </label>
+          <div class="note repair-only">This follows the repair level selected on the Solutions tab.</div>
+          <div class="detail-grid repair-only">
+            <label class="field">
+              <span>Repairs in last 24 months</span>
+              <select class="select" data-input="recentRepairCount">
+                <option value="0">0 repairs</option>
+                <option value="1">1 repair</option>
+                <option value="2">2 repairs</option>
+                <option value="3">3+ repairs</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Still under warranty?</span>
+              <select class="select" data-input="warrantyStatus">
+                <option value="unknown">Not sure</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+              </select>
+            </label>
+          </div>
+          <div class="note repair-only" id="repairRiskNote"></div>
+          <div class="range-field repair-only">
+            <div class="range-head"><span>Estimated future repairs</span><strong class="range-value" id="futureRepairsValue"></strong></div>
+            <input data-input="futureRepairCount" type="range" min="0" max="99" step="1">
+          </div>
+          <div class="note repair-only" id="repairPlanNote">A planning estimate for additional repairs during the homeowner's expected stay. It is not a guarantee.</div>
+          <div class="range-field repair-only">
+            <div class="range-head"><span>Typical future repair</span><strong class="range-value" id="futureRepairCostValue"></strong></div>
+            <input data-input="futureRepairCost" type="range" min="0" max="4000" step="50">
+          </div>
+          <div class="note repair-only">The estimated cost of one future repair in today's dollars. The tool increases this over time using repair inflation.</div>
+          <div class="range-field repair-only">
+            <div class="range-head"><span>Repair inflation</span><strong class="range-value" id="repairInflationValue"></strong></div>
+            <input data-input="repairInflation" type="range" min="0" max="8" step=".25">
+          </div>
+          <div class="note repair-only">The yearly increase used for future repair costs. Default is 4% to keep the estimate conservative and tied to broad inflation.</div>
+          <div class="calc-note repair-only" aria-label="Future repair calculation">
+            <div class="row"><span>Base future repairs</span><strong id="baseFutureRepairsValue"></strong></div>
+            <div class="row"><span>With repair inflation</span><strong id="inflatedFutureRepairsValue"></strong></div>
+          </div>
+        </section>
+        </div>
+      </section>
+    </section>
+
+    <section class="tab-panel" id="operatingTab">
+      <section class="details">
+        <div class="details-head">
+          <div>
+            <h2>Operating Cost</h2>
+            <p class="note">A snapshot of your HVAC operating cost: current efficiency, utility use, and conservative savings.</p>
+          </div>
+          <button class="btn primary small" type="button" data-tab-jump="solutions">Next: solutions</button>
+        </div>
+        <div class="detail-sections operating-grid">
+          <section class="detail-section utility climate-section">
+            <h3>Location / Climate</h3>
+            <div class="detail-grid">
+              <label class="field">
+                <span>ZIP Code</span>
+                <input class="plain-input" data-input="zipCode" inputmode="numeric" type="text" maxlength="5" placeholder="optional">
+              </label>
+              <label class="field">
+                <span>State</span>
+                <output class="readonly-value" id="zipStateValue">--</output>
+              </label>
+              <label class="field full">
+                <span>Climate zone</span>
+                <select class="select" data-input="climateZone">
+                  <option value="mixed">Mixed / balanced</option>
+                  <option value="hotHumid">Hot / humid</option>
+                  <option value="hotDry">Hot / dry</option>
+                  <option value="cold">Cold heating-heavy</option>
+                  <option value="marine">Mild / marine</option>
+                </select>
+              </label>
+            </div>
+            <div class="note" id="climateNote"></div>
+          </section>
+
+          <section class="detail-section utility utility-section">
+            <h3>Utility Use</h3>
+            <label class="field">
+              <span>Average monthly electric bill</span>
+              <div class="input-wrap"><b>$</b><input data-input="electricBill" inputmode="decimal" type="text"></div>
+            </label>
+            <div class="range-field">
+              <div class="range-head"><span>Estimated cooling portion</span><strong class="range-value" id="coolingPercentValue"></strong></div>
+              <input data-input="coolingPercent" type="range" min="0" max="80" step="1">
+            </div>
+            <div class="note">EIA residential electricity data lists air conditioning at 19% of home electricity use in 2020. The tool defaults near that level, then calculates savings from a more conservative number.</div>
+            <div class="note" id="coolingNote"></div>
+
+            <label class="field">
+              <span>Average monthly gas bill</span>
+              <div class="input-wrap"><b>$</b><input data-input="gasBill" inputmode="decimal" type="text"></div>
+            </label>
+            <div class="range-field">
+              <div class="range-head"><span>Estimated heating portion</span><strong class="range-value" id="heatingPercentValue"></strong></div>
+              <input data-input="heatingPercent" type="range" min="0" max="100" step="1">
+            </div>
+            <div class="note">EIA says space heating and air conditioning made up 52% of household energy use in 2020, and natural gas is commonly used for space heating. Use the slider to estimate the heating portion of the gas bill.</div>
+            <div class="note" id="heatingNote"></div>
+          </section>
+
+          <section class="detail-section savings savings-section">
+            <h3>Current System Snapshot</h3>
+            <div class="note">This snapshot uses the A/C age, furnace age, fuel type, and furnace efficiency entered on the Discovery tab.</div>
+            <div class="calc-note" aria-label="Current system efficiency basis">
+              <div class="row"><span>A/C age</span><strong id="operatingAcAgeValue"></strong></div>
+              <div class="row"><span>Furnace age</span><strong id="operatingFurnaceAgeValue"></strong></div>
+              <div class="row"><span>Approx. cooling efficiency</span><strong id="operatingCoolingEfficiencyValue"></strong></div>
+              <div class="row"><span>Heating fuel / efficiency</span><strong id="operatingHeatingEfficiencyValue"></strong></div>
+            </div>
+            <div class="operating-snapshot" aria-label="Current operating cost snapshot">
+              <div class="row"><span>Current HVAC operating cost</span><strong id="currentOperatingValue"></strong></div>
+              <div class="row"><span>Conservative cooling used</span><strong id="currentCoolingUsedValue"></strong></div>
+              <div class="row"><span>Conservative heating used</span><strong id="currentHeatingUsedValue"></strong></div>
+            </div>
+            <div class="note">Replacement savings are set with the replacement options on the Solutions tab.</div>
+          </section>
+
+        </div>
+        <section class="source-card" aria-label="Energy data source">
+          <div>
+            <h3>Where the Utility Data Comes From</h3>
+            <p class="note">The cooling and heating starting points are backed by EIA residential energy data. EIA reported that air conditioning was 19% of home electricity use in 2020, and its RECS dashboard shows state-level residential energy estimates.</p>
+            <div class="source-links">
+              <a href="https://experience.arcgis.com/experience/cbf6875974554a74823232f84f563253" target="_blank" rel="noopener">EIA RECS dashboard</a>
+              <a href="https://www.eia.gov/energyexplained/use-of-energy/electricity-use-in-homes.php" target="_blank" rel="noopener">EIA electricity use</a>
+            </div>
+          </div>
+          <div class="qr-block">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=132x132&amp;data=https%3A%2F%2Fexperience.arcgis.com%2Fexperience%2Fcbf6875974554a74823232f84f563253" alt="QR code for EIA RECS dashboard">
+            <span>Scan source</span>
+          </div>
+        </section>
+        <div class="advanced">
+          <button class="btn soft small" type="button" data-tab-jump="details">Back to discovery</button>
+          <button class="btn primary small" type="button" data-tab-jump="solutions">Show solutions</button>
+        </div>
+      </section>
+    </section>
+
+    <section class="tab-panel" id="solutionsTab">
+      <section class="conversation-summary" aria-label="What we found">
+        <h2>What We Found</h2>
+        <div class="finding-grid">
+          <label class="field">
+            <span>What you called for</span>
+            <textarea data-input="calledFor"></textarea>
+          </label>
+          <label class="field">
+            <span>What we found</span>
+            <textarea data-input="foundIssue"></textarea>
+          </label>
+          <label class="field">
+            <span>Why it matters</span>
+            <textarea data-input="whyItMatters"></textarea>
+          </label>
+          <label class="field">
+            <span>Options below</span>
+            <textarea data-input="nextStepSummary"></textarea>
+          </label>
+        </div>
+      </section>
+
+      <section class="options" id="optionCards" aria-label="HVAC options"></section>
+
+      <section class="details solution-setup">
+        <div class="details-head">
+          <div>
+            <h2>Solution Prices</h2>
+            <p class="note">Enter the actual repair and replacement options once the repair and operating cost picture is clear.</p>
+          </div>
+        </div>
+        <div class="detail-sections">
+          <section class="detail-section repair repair-only" id="repairOptionsSetup">
+            <h3>Repair Options</h3>
+            <div class="detail-grid">
+              <label class="field">
+                <span>Most complete label</span>
+                <input class="plain-input" data-input="repairCompleteLabel" type="text">
+              </label>
+              <label class="field">
+                <span>Most complete price</span>
+                <div class="input-wrap"><b>$</b><input data-input="repairCompletePrice" inputmode="decimal" type="text"></div>
+              </label>
+              <label class="field full">
+                <span>Most complete description</span>
+                <textarea data-input="repairCompleteDescription"></textarea>
+              </label>
+              <label class="field full">
+                <span>Most complete payment option</span>
+                <select class="select" data-input="repairCompletePlanId" id="repairCompletePlanSelect"></select>
+              </label>
+              <label class="field">
+                <span>Balanced label</span>
+                <input class="plain-input" data-input="repairRecommendedLabel" type="text">
+              </label>
+              <label class="field">
+                <span>Balanced price</span>
+                <div class="input-wrap"><b>$</b><input data-input="repairRecommendedPrice" inputmode="decimal" type="text"></div>
+              </label>
+              <label class="field full">
+                <span>Balanced description</span>
+                <textarea data-input="repairRecommendedDescription"></textarea>
+              </label>
+              <label class="field full">
+                <span>Balanced payment option</span>
+                <select class="select" data-input="repairRecommendedPlanId" id="repairRecommendedPlanSelect"></select>
+              </label>
+              <label class="field">
+                <span>Minimum label</span>
+                <input class="plain-input" data-input="repairBareLabel" type="text">
+              </label>
+              <label class="field">
+                <span>Minimum price</span>
+                <div class="input-wrap"><b>$</b><input data-input="repairBarePrice" inputmode="decimal" type="text"></div>
+              </label>
+              <label class="field full">
+                <span>Minimum description</span>
+                <textarea data-input="repairBareDescription"></textarea>
+              </label>
+              <label class="field full">
+                <span>Minimum payment option</span>
+                <select class="select" data-input="repairBarePlanId" id="repairBarePlanSelect"></select>
+              </label>
+            </div>
+          </section>
+
+          <section class="detail-section prices">
+            <h3>Replacement Options</h3>
+            <div class="detail-grid">
+              <label class="field">
+                <span>Best label</span>
+                <input class="plain-input" data-input="bestLabel" type="text">
+              </label>
+              <label class="field">
+                <span>Best price</span>
+                <div class="input-wrap"><b>$</b><input data-input="bestPrice" inputmode="decimal" type="text"></div>
+              </label>
+              <label class="field full">
+                <span>Best description</span>
+                <textarea data-input="bestDescription"></textarea>
+              </label>
+              <div class="range-field full">
+                <div class="range-head"><span>Best estimated savings</span><strong class="range-value" id="bestSavingsValue"></strong></div>
+                <input data-input="bestSavings" type="range" min="0" max="40" step="1">
+              </div>
+              <label class="field">
+                <span>Better label</span>
+                <input class="plain-input" data-input="betterLabel" type="text">
+              </label>
+              <label class="field">
+                <span>Better price</span>
+                <div class="input-wrap"><b>$</b><input data-input="betterPrice" inputmode="decimal" type="text"></div>
+              </label>
+              <label class="field full">
+                <span>Better description</span>
+                <textarea data-input="betterDescription"></textarea>
+              </label>
+              <div class="range-field full">
+                <div class="range-head"><span>Better estimated savings</span><strong class="range-value" id="betterSavingsValue"></strong></div>
+                <input data-input="betterSavings" type="range" min="0" max="40" step="1">
+              </div>
+              <label class="field">
+                <span>Basic label</span>
+                <input class="plain-input" data-input="basicLabel" type="text">
+              </label>
+              <label class="field">
+                <span>Basic price</span>
+                <div class="input-wrap"><b>$</b><input data-input="basicPrice" inputmode="decimal" type="text"></div>
+              </label>
+              <label class="field full">
+                <span>Basic description</span>
+                <textarea data-input="basicDescription"></textarea>
+              </label>
+              <div class="range-field full">
+                <div class="range-head"><span>Basic estimated savings</span><strong class="range-value" id="basicSavingsValue"></strong></div>
+                <input data-input="basicSavings" type="range" min="0" max="40" step="1">
+              </div>
+              <label class="field full">
+                <span>Repair description</span>
+                <textarea data-input="repairDescription"></textarea>
+              </label>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <div class="advanced">
+        <button class="btn soft small" type="button" data-tab-jump="operating">Back to operating cost</button>
+        <button class="btn primary small" type="button" data-tab-jump="financing">Show payment options</button>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="financingTab">
+      <section class="details">
+        <div class="details-head">
+          <div>
+            <h2>Payment Options</h2>
+            <p class="note">Automatic payment estimates from the repair levels and replacement prices entered in this review.</p>
+          </div>
+          <a class="btn soft small" id="fieldFinanceTopLink" href="#" target="_blank" rel="noopener">Open full tool</a>
+        </div>
+        <p class="note" id="paymentPlanNote" style="padding:14px 16px 0; margin:0;"></p>
+        <section class="finance-grid" id="financeCards" aria-label="Payment options"></section>
+        <div class="advanced">
+          <button class="btn soft small" type="button" data-tab-jump="solutions">Back to solutions</button>
+          <a class="btn soft small" id="fieldFinanceBottomLink" href="#" target="_blank" rel="noopener">Open full payment tool</a>
+        </div>
+      </section>
+    </section>
+
+    <section class="print-summary" id="printSummary" aria-label="Homeowner print summary"></section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const STORAGE_KEY = "hvac-repair-replace-true-cost-v1";
+    const BRAND_KEY = "hvac-repair-replace-brand-v1";
+    const LOGO_FALLBACK = "assets/blue-tools-logo.png";
+    const FIELD_FINANCING_URL = "https://thetrustree.github.io/field-tools/#team-setup=g.H4sIAAAAAAAAE62Y227jNhCGX4UQGiALyFqeRaZXizbt7kWyQTZAgQ32QkjkRKgPqQ-bLoq-e2dIWbYlUlbs5iLjhPQ_H4cz5Ej_JN-TizxNHpKL-_tkWS6-Vw_laFzNihlYTrlO0iRJ77-lODxmlOI_0JAR0eRqPls9L9Nfy3G5WJSPn2arclEuV6_V6vmqmlXT9dTNmPy4KX5My9lqmaQ6panIcpUqSlMQgp80OUqJApRjYtwxMQ5M8KuWIhstshEjqEZqOVLrka0g4yG2UxS3iMYjGkQ0xwsyA4gSERFvy3iCZMPIpWPkEhjh19GCXAJj3mE8RbJm5D79eCv9yNdyMW9pXX_uyIy-FNOSFEvyS7F89onI9xFPVGwo3W7zzm4PFCX7qm7LTWajO36cbAPrtp13tv04Vbf3jEV3_jjVmlVQroAVDbKqPlUYvfxrXUxC-alcQNvpeaxcAye0gxOYm6I3lWA0piZ0IIBHqzVs0jg2iRkpe1MHRmNqEjOR8XbkjtZr6HLu6HI8wHPepwajMbUcT2-W77MdrVazSWExcmjwxMmsPSMfbm7JeyKuP13fgNW09gAnCvjNrIErpFWsgbmNPtNOn-mIPuPbL8Fn8MA03AAsFSEPu7MbF5Q5F5RheA8ugWeU-1tw8Bq4d8BjDrpr4MCfQSEOX4S75NGADztgEXCZs3am9q1BeH0R0--uQXgPg5egvQvdcaHf5CI0e-OCce8DbcsJ431eZCbaLUVofuPHVwXrVEWgGrrdylYHrh3UAdPKnEBKSsyXmI7PDt7JjkBW0JgI08otSquWiFGNiAGETKseEeUjo0xLxG5JLEZGmT4R6kVoWyTfiuQuNWRUwx8srHOwRA6UvJVmu0nFfE61yztY1rJT1lslah0TmLaS2VEyNKWZ1WkPkF8aRxnTD-QeNyIyda0ESiVQIXEZZn2gbVtGyq2MlBho2yNDcydD87ZMKzYso3lI5hsKvZaTyXI0LhZP81HxUv7dfoR7HcNjEjZ8aMDRl5fyoYIL8LZYlWQ-JtR79T2PJKW7Haf17fiy3-IzmlG996jkv12vCV25lgjNAVcwIebKN0Q8k6zfletw0BxwBRNirnx_A3er6XelqXOl6QFXMCHsipzfFItV9VC9FKtq9gSbfD2fjfb-984dWNinmhTOgQAO2-C47gnNARyYcAqO76-gMZDQQfcBSYsFgSYAJJvM7t8Ncs4zIc42f5Nx8bCaL965TcIRCIzM97Zpu0HCA4gggNgH6NkjlhkdAHD3mtGpzRQPAwhtBTa0YAIA-T6AjaU-AkgeAICjEUcAgKo0jxAY6whMKAQtAjzu4gg8hFAfrtCdsD4IS30YQoVi3xAGFQ2DwlbVxAG4BwiVhn1LFESXYFjV7NwfYUjq32lQ_07jeucRpRrD80j1SKoZ-W09mThM-Lx5FvyZLMqn9aRYdIFdmqsztMV0vkZm_0bvkZz_JCmZVjNMZAidwmLaP-52EHYgXYNF_Tu2AZDNS7OTKRl3mDLTQyiNpzQDKc3_RmkcpcrUYUrlygJNICtVZnfP7A7O-oWs5kQbP-JyM1ehUwquDezpTMZE722We5o8SJMPooGL5QBNzj2NznT_3Wo9jY0dGUNo6A4NfqFLgyVpseeNhQabqWSRXEDTlBTe_JlcJHcfL8nvt5__uPtI7i4_XAHpOLlg__4HrTGt6EUXAAA";
+
+    const defaults = {
+      yearsInHome: 7,
+      ownedHomeYears: 5,
+      acAge: 16,
+      furnaceAge: 16,
+      acInstalledSeer: 10,
+      fuelType: "gas",
+      furnaceEfficiency: 80,
+      maintenanceHistory: "overFive",
+      conversationType: "repair",
+      recentRepairCount: 0,
+      warrantyStatus: "unknown",
+      zipCode: "",
+      climateZone: "mixed",
+      electricBill: 300,
+      gasBill: 100,
+      coolingPercent: 20,
+      heatingPercent: 60,
+      repairCompletePlanId: "sf4612",
+      repairRecommendedPlanId: "sf4612",
+      repairBarePlanId: "sf4612",
+      repairCost: 1379,
+      selectedRepairLevel: "complete",
+      repairBareLabel: "Minimum repair",
+      repairBarePrice: 425,
+      repairBareDescription: "Replaces the failed capacitor to restore cooling today.",
+      repairRecommendedLabel: "Balanced repair",
+      repairRecommendedPrice: 879,
+      repairRecommendedDescription: "Restores cooling and addresses the main worn electrical components.",
+      repairCompleteLabel: "Most complete repair",
+      repairCompletePrice: 1379,
+      repairCompleteDescription: "Addresses the failed part, worn electrical components, airflow cleaning, and maintenance.",
+      futureRepairCount: 3,
+      futureRepairCost: 1200,
+      repairInflation: 4,
+      equipmentInflation: 4,
+      calledFor: "No cooling upstairs. Outdoor A/C not starting.",
+      foundIssue: "Failed capacitor. A/C and furnace are both 11 years old. Blower wheel is dirty, contactor is pitted, capacitor is weak, and the system has not had maintenance in over five years.",
+      whyItMatters: "The repair should restore cooling today. Cleaning the blower wheel and system helps reduce strain. If the system keeps running dirty or with weak electrical parts, it can work harder and may need more repairs.",
+      nextStepSummary: "The options below compare today's repair with replacement choices for long-term planning.",
+      bestLabel: "Best",
+      betterLabel: "Better",
+      basicLabel: "Basic",
+      repairLabel: "Repair",
+      bestDescription: "Highest comfort, strongest efficiency, longest-term value",
+      betterDescription: "Balanced comfort, savings, and investment",
+      basicDescription: "New system, lower upfront investment",
+      repairDescription: "Repair the current system using the selected repair level.",
+      bestPrice: 24000,
+      betterPrice: 21000,
+      basicPrice: 18000,
+      bestSavings: 20,
+      betterSavings: 15,
+      basicSavings: 10,
+      openCards: {}
+    };
+
+    const defaultBrand = {
+      name: "Atlantic North",
+      logoUrl: LOGO_FALLBACK,
+      logoData: ""
+    };
+
+    const ageDefaults = {
+      "0-5": { repairs: 0, cost: 0, efficiency: "newer system range", cooling: "14.3+ SEER2", heating: "80-97% AFUE", note: "Maintenance is key at this age. Future repair defaults start at zero." },
+      "6-10": { repairs: 1, cost: 500, efficiency: "about 14-15 SEER/SEER2 and 80-95% AFUE", cooling: "14-15 SEER/SEER2", heating: "80-95% AFUE", note: "One future repair is used as a conservative planning placeholder." },
+      "11-15": { repairs: 2, cost: 750, efficiency: "about 12-14 SEER and 80-92% AFUE", cooling: "12-14 SEER", heating: "80-92% AFUE", note: "Two future repairs are used as an estimate, not a guarantee." },
+      "16-20": { repairs: 3, cost: 1000, efficiency: "about 10-12 SEER and 78-85% AFUE", cooling: "10-12 SEER", heating: "78-85% AFUE", note: "Three future repairs are used as an estimate, not a guarantee." },
+      "20+": { repairs: 4, cost: 1500, efficiency: "often 8-10 SEER and 70-80% AFUE", cooling: "8-10 SEER", heating: "70-80% AFUE", note: "Four future repairs are used as an estimate, not a guarantee." }
+    };
+
+    const climatePresets = {
+      mixed: { label: "Mixed / balanced", cooling: 20, heating: 60, coolingHours: 1200, heatingHours: 1750, note: "Balanced climates use both cooling and heating, so the defaults keep both sides active." },
+      hotHumid: { label: "Hot / humid", cooling: 30, heating: 35, coolingHours: 2200, heatingHours: 750, note: "Hot-humid climates generally place more weight on cooling use." },
+      hotDry: { label: "Hot / dry", cooling: 28, heating: 30, coolingHours: 1800, heatingHours: 1250, note: "Hot-dry climates generally place more weight on cooling, with lower heating exposure." },
+      cold: { label: "Cold heating-heavy", cooling: 12, heating: 75, coolingHours: 800, heatingHours: 2250, note: "Cold climates generally place more weight on heating use." },
+      marine: { label: "Mild / marine", cooling: 12, heating: 45, coolingHours: 500, heatingHours: 1250, note: "Mild marine climates often have lower cooling load and moderate heating use." }
+    };
+
+    const zipStateRanges = [
+      [350, 369, "AL"], [995, 999, "AK"], [850, 865, "AZ"], [716, 729, "AR"],
+      [900, 961, "CA"], [800, 816, "CO"], [60, 69, "CT"], [197, 199, "DE"],
+      [320, 349, "FL"], [300, 319, "GA"], [967, 968, "HI"], [832, 838, "ID"],
+      [600, 629, "IL"], [460, 479, "IN"], [500, 528, "IA"], [660, 679, "KS"],
+      [400, 427, "KY"], [700, 714, "LA"], [39, 49, "ME"], [206, 219, "MD"],
+      [10, 27, "MA"], [480, 499, "MI"], [550, 567, "MN"], [386, 397, "MS"],
+      [630, 658, "MO"], [590, 599, "MT"], [680, 693, "NE"], [889, 898, "NV"],
+      [30, 38, "NH"], [70, 89, "NJ"], [870, 884, "NM"], [100, 149, "NY"],
+      [270, 289, "NC"], [580, 588, "ND"], [430, 459, "OH"], [730, 749, "OK"],
+      [970, 979, "OR"], [150, 196, "PA"], [6, 9, "PR"], [28, 29, "RI"],
+      [290, 299, "SC"], [570, 577, "SD"], [370, 385, "TN"], [750, 799, "TX"],
+      [840, 847, "UT"], [50, 59, "VT"], [201, 246, "VA"], [980, 994, "WA"],
+      [247, 268, "WV"], [530, 549, "WI"], [820, 831, "WY"]
+    ];
+
+    function stateFromZip(zip) {
+      const value = String(zip || "").trim();
+      if (!/^\d{5}$/.test(value)) return "";
+      const prefix = Number(value.slice(0, 3));
+      const match = zipStateRanges.find(([start, end]) => prefix >= start && prefix <= end);
+      return match ? match[2] : "";
+    }
+
+    function climateFromZip(zip) {
+      const value = String(zip || "").trim();
+      if (!/^\d{5}$/.test(value)) return "";
+      const prefix = Number(value.slice(0, 1));
+      const firstTwo = Number(value.slice(0, 2));
+      if (firstTwo >= 90 && firstTwo <= 96) return "marine";
+      if (prefix === 0 || prefix === 1 || prefix === 5) return "cold";
+      if (prefix === 3 || firstTwo === 70 || firstTwo === 71) return "hotHumid";
+      if (prefix === 8 || firstTwo === 97 || firstTwo === 98 || firstTwo === 99) return "hotDry";
+      return "mixed";
+    }
+
+    function applyClimatePreset(zone) {
+      const preset = climatePresets[zone] || climatePresets.mixed;
+      state.climateZone = zone;
+      state.coolingPercent = preset.cooling;
+      state.heatingPercent = preset.heating;
+    }
+
+    function ageBucket(age) {
+      const years = Number(age) || 0;
+      if (years <= 5) return "0-5";
+      if (years <= 10) return "6-10";
+      if (years <= 15) return "11-15";
+      if (years <= 20) return "16-20";
+      return "20+";
+    }
+
+    function estimatedAcInstalledSeer(age) {
+      const years = Number(age) || 0;
+      if (years <= 5) return 14.3;
+      if (years <= 10) return 14;
+      if (years <= 15) return 12;
+      if (years <= 20) return 10;
+      return 8;
+    }
+
+    function estimatedAcEfficiencyLoss(age) {
+      return clamp(Math.round((Number(age) || 0) * 0.8), 0, 20);
+    }
+
+    function estimatedFurnaceEfficiencyLoss(age) {
+      return clamp(Math.round((Number(age) || 0) * 0.45), 0, 15);
+    }
+
+    function currentPlanningAge() {
+      return Math.max(Number(state.acAge) || 0, Number(state.furnaceAge) || 0);
+    }
+
+    function projectedSystemAge() {
+      return Math.min(99, currentPlanningAge() + (Number(state.yearsInHome) || 0));
+    }
+
+    function projectedRepairPlan() {
+      const currentAge = currentPlanningAge();
+      const stayYears = Number(state.yearsInHome) || 0;
+      const projectedAge = projectedSystemAge();
+      const plan = { ...(ageDefaults[ageBucket(projectedAge)] || ageDefaults["20+"]) };
+
+      if (projectedAge > 20) {
+        if (currentAge >= 20) {
+          plan.repairs = Math.max(4, Math.round(stayYears));
+        } else {
+          plan.repairs = 3 + Math.ceil(projectedAge - 20);
+        }
+        plan.cost = ageDefaults["20+"].cost;
+      }
+
+      if (state.recentRepairCount > 0) {
+        plan.repairs += Math.min(3, Math.round(state.recentRepairCount));
+      }
+
+      return plan;
+    }
+
+    const financingPlans = {
+      repair: [
+        { id: "sf4612", plan: "Service Finance 4612", label: "9.99% APR / 6NINP / 60 months", factor: 0.0212, min: 500 },
+        { id: "sf4089", plan: "Service Finance 4089", label: "6.99% APR / 180 months", factor: 0.0089, min: 3000 },
+        { id: "sf4212", plan: "Service Finance 4212", label: "9.99% APR / 60 months", factor: 0.0212, min: 1000 }
+      ],
+      replacement: [
+        { id: "sf4089", plan: "Service Finance 4089", label: "6.99% APR / 180 months", factor: 0.0089, min: 3000 }
+      ]
+    };
+
+    const clone = value => JSON.parse(JSON.stringify(value));
+    let state = loadState();
+    let brand = loadBrand();
+    let activeTab = "details";
+
+    function loadState() {
+      try {
+        return normalize({ ...clone(defaults), ...(JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}) });
+      } catch {
+        return clone(defaults);
+      }
+    }
+
+    function loadBrand() {
+      try {
+        const saved = { ...clone(defaultBrand), ...(JSON.parse(localStorage.getItem(BRAND_KEY)) || {}) };
+        if (["assets/atlantic-north-logo.png", "assets/viking-service-logo.png"].includes(saved.logoUrl) && !saved.logoData) saved.logoUrl = LOGO_FALLBACK;
+        return saved;
+      } catch {
+        return clone(defaultBrand);
+      }
+    }
+
+    function normalize(data) {
+      const normalized = { ...clone(defaults), ...data };
+      Object.keys(defaults).forEach(key => {
+        if (typeof defaults[key] === "number") normalized[key] = cleanNumber(normalized[key]);
+      });
+      if (data.systemAge && !data.acAge) normalized.acAge = cleanNumber(data.systemAge);
+      if (data.systemAge && !data.furnaceAge) normalized.furnaceAge = cleanNumber(data.systemAge);
+      if (data.calledFor === "A concern with the current heating and cooling system.") {
+        normalized.calledFor = defaults.calledFor;
+      }
+      if (data.foundIssue === "The system is older and today's repair gets it running, but future repairs and operating cost should be reviewed.") {
+        normalized.foundIssue = defaults.foundIssue;
+      }
+      if (data.whyItMatters === "Repairing today may solve the immediate problem, but age, efficiency, and future repair risk can change the long-term cost.") {
+        normalized.whyItMatters = defaults.whyItMatters;
+      }
+      if (data.nextStepSummary === "The options below compare repair, replacement choices, monthly payment, and operating cost using the numbers entered here.") {
+        normalized.nextStepSummary = defaults.nextStepSummary;
+      }
+      if (data.repairBareLabel === "Bare minimum repair") normalized.repairBareLabel = defaults.repairBareLabel;
+      if (data.repairBareDescription === "Replace the failed capacitor to get the outdoor A/C starting today.") normalized.repairBareDescription = defaults.repairBareDescription;
+      if (data.repairRecommendedLabel === "Recommended repair") normalized.repairRecommendedLabel = defaults.repairRecommendedLabel;
+      if (data.repairRecommendedDescription === "Replace the capacitor and contactor, then clean the outdoor unit.") normalized.repairRecommendedDescription = defaults.repairRecommendedDescription;
+      if (data.repairCompleteLabel === "Complete repair") normalized.repairCompleteLabel = defaults.repairCompleteLabel;
+      if (data.repairCompleteDescription === "Clean the blower wheel, replace the capacitor and contactor, complete system maintenance, and start a maintenance plan.") normalized.repairCompleteDescription = defaults.repairCompleteDescription;
+      if (data.repairPlanId && !data.repairCompletePlanId) normalized.repairCompletePlanId = data.repairPlanId;
+      if (data.repairPlanId && !data.repairRecommendedPlanId) normalized.repairRecommendedPlanId = data.repairPlanId;
+      if (data.repairPlanId && !data.repairBarePlanId) normalized.repairBarePlanId = data.repairPlanId;
+      normalized.yearsInHome = clamp(Math.round(normalized.yearsInHome || 1), 1, 99);
+      normalized.ownedHomeYears = clamp(Math.round(normalized.ownedHomeYears || 0), 0, 50);
+      normalized.acAge = clamp(Math.round(normalized.acAge || 0), 0, 40);
+      normalized.furnaceAge = clamp(Math.round(normalized.furnaceAge || 0), 0, 40);
+      if (!data.acInstalledSeer) normalized.acInstalledSeer = estimatedAcInstalledSeer(normalized.acAge);
+      normalized.acInstalledSeer = clamp(normalized.acInstalledSeer, 6, 30);
+      if (!["gas", "electric"].includes(normalized.fuelType)) normalized.fuelType = "gas";
+      normalized.furnaceEfficiency = clamp(normalized.furnaceEfficiency || 80, 60, 99);
+      if (!["recent", "oneTwo", "threeFive", "overFive", "unknown"].includes(normalized.maintenanceHistory)) normalized.maintenanceHistory = defaults.maintenanceHistory;
+      if (!["repair", "replacement"].includes(normalized.conversationType)) normalized.conversationType = defaults.conversationType;
+      if (!financingPlans.repair.some(plan => plan.id === normalized.repairCompletePlanId)) normalized.repairCompletePlanId = defaults.repairCompletePlanId;
+      if (!financingPlans.repair.some(plan => plan.id === normalized.repairRecommendedPlanId)) normalized.repairRecommendedPlanId = defaults.repairRecommendedPlanId;
+      if (!financingPlans.repair.some(plan => plan.id === normalized.repairBarePlanId)) normalized.repairBarePlanId = defaults.repairBarePlanId;
+      if (!["bare", "recommended", "complete"].includes(normalized.selectedRepairLevel)) normalized.selectedRepairLevel = "complete";
+      if (data.recentRepairs === "yes" && !data.recentRepairCount) normalized.recentRepairCount = 1;
+      if (data.recentRepairs === "no" && !data.recentRepairCount) normalized.recentRepairCount = 0;
+      normalized.recentRepairCount = clamp(Math.round(normalized.recentRepairCount || 0), 0, 3);
+      normalized.zipCode = String(normalized.zipCode || "").replace(/\D/g, "").slice(0, 5);
+      if (!climatePresets[normalized.climateZone]) normalized.climateZone = "mixed";
+      if (data.utilityBill && !data.electricBill) normalized.electricBill = cleanNumber(data.utilityBill);
+      if (data.hvacPercent && !data.coolingPercent) normalized.coolingPercent = cleanNumber(data.hvacPercent);
+      normalized.coolingPercent = clamp(normalized.coolingPercent, 0, 80);
+      normalized.heatingPercent = clamp(normalized.heatingPercent, 0, 100);
+      normalized.repairInflation = clamp(normalized.repairInflation, 0, 8);
+      normalized.equipmentInflation = clamp(normalized.equipmentInflation, 0, 8);
+      return normalized;
+    }
+
+    function save() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function saveBrand() {
+      localStorage.setItem(BRAND_KEY, JSON.stringify(brand));
+    }
+
+    const scenarios = {
+      repair: {
+        conversationType: "repair",
+        yearsInHome: 7,
+        ownedHomeYears: 5,
+        acAge: 11,
+        furnaceAge: 11,
+        acInstalledSeer: 12,
+        furnaceEfficiency: 80,
+        maintenanceHistory: "overFive",
+        recentRepairCount: 0,
+        warrantyStatus: "unknown",
+        calledFor: "No cooling upstairs. Outdoor A/C not starting.",
+        foundIssue: "Failed capacitor. A/C and furnace are both 11 years old. Blower wheel is dirty, contactor is pitted, capacitor is weak, and the system has not had maintenance in over five years.",
+        whyItMatters: "The repair should restore cooling today. Cleaning the blower wheel and system helps reduce strain. If the system keeps running dirty or with weak electrical parts, it can work harder and may need more repairs.",
+        nextStepSummary: "The options below compare today's repair with replacement choices for long-term planning.",
+        selectedRepairLevel: "complete",
+        futureRepairCount: 3,
+        futureRepairCost: 1379
+      },
+      replacement: {
+        conversationType: "replacement",
+        yearsInHome: 12,
+        ownedHomeYears: 3,
+        acAge: 18,
+        furnaceAge: 18,
+        acInstalledSeer: 10,
+        furnaceEfficiency: 80,
+        maintenanceHistory: "unknown",
+        calledFor: "Review options for replacing the current HVAC system.",
+        foundIssue: "The current A/C and furnace are older, out of the main warranty window, and the homeowner wants to understand replacement choices.",
+        whyItMatters: "When replacement is already the conversation, the clearest next step is comparing comfort level, installed price, monthly payment, and estimated operating cost.",
+        nextStepSummary: "The options below compare Best, Better, and Basic replacement choices.",
+        futureRepairCount: 0
+      },
+      older: {
+        conversationType: "repair",
+        yearsInHome: 15,
+        ownedHomeYears: 10,
+        acAge: 22,
+        furnaceAge: 22,
+        acInstalledSeer: 8,
+        furnaceEfficiency: 80,
+        maintenanceHistory: "overFive",
+        recentRepairCount: 2,
+        warrantyStatus: "no",
+        calledFor: "System is not keeping up and has had repeat issues.",
+        foundIssue: "A/C and furnace are both over 20 years old. The system has had recent repairs, no active warranty, and a long gap in maintenance.",
+        whyItMatters: "Repeat repairs, age, and limited maintenance history can make short-term repair less predictable over the years the homeowner plans to stay.",
+        nextStepSummary: "The options below compare a repair path with replacement choices for longer-term planning.",
+        selectedRepairLevel: "complete",
+        futureRepairCount: 8,
+        futureRepairCost: 1500
+      }
+    };
+
+    function cleanNumber(value) {
+      const number = Number(String(value ?? "").replace(/[$,%\s]/g, "").replaceAll(",", ""));
+      return Number.isFinite(number) ? number : 0;
+    }
+
+    function clamp(value, min, max) {
+      return Math.min(max, Math.max(min, Number(value) || 0));
+    }
+
+    function money(value) {
+      const rounded = Math.round(Number(value) || 0);
+      return "$" + rounded.toLocaleString();
+    }
+
+    function moneyText(value) {
+      const rounded = Math.round(Number(value) || 0);
+      return rounded.toLocaleString();
+    }
+
+    function percent(value) {
+      return (Math.round(Number(value) * 100) / 100).toString().replace(/\.0$/, "") + "%";
+    }
+
+    function oneDecimal(value) {
+      return (Math.round(Number(value) * 10) / 10).toString().replace(/\.0$/, "");
+    }
+
+    function maintenanceHistoryNote(value) {
+      const notes = {
+        recent: "Recent maintenance supports the current planning picture and helps confirm the system has been cared for.",
+        oneTwo: "Maintenance within the last couple of years gives some useful history, but the current condition still matters.",
+        threeFive: "A longer gap can allow dirt, weak electrical parts, and airflow issues to build up over time.",
+        overFive: "No maintenance in over five years can help explain dirt buildup, extra strain, and repair risk.",
+        unknown: "If maintenance history is unknown, the technician should lean on the current condition found today."
+      };
+      return notes[value] || notes.unknown;
+    }
+
+    function selectedFinancingPlan(type, planId) {
+      const plans = financingPlans[type] || [];
+      const selectedId = planId || plans[0]?.id;
+      return plans.find(plan => plan.id === selectedId) || plans[0];
+    }
+
+    function payment(amount, type, planId) {
+      const rule = selectedFinancingPlan(type, planId);
+      if (amount < rule.min) return null;
+      return amount * rule.factor;
+    }
+
+    function repairLevels() {
+      return [
+        { id: "complete", label: state.repairCompleteLabel, price: state.repairCompletePrice, description: state.repairCompleteDescription, planId: state.repairCompletePlanId },
+        { id: "recommended", label: state.repairRecommendedLabel, price: state.repairRecommendedPrice, description: state.repairRecommendedDescription, planId: state.repairRecommendedPlanId },
+        { id: "bare", label: state.repairBareLabel, price: state.repairBarePrice, description: state.repairBareDescription, planId: state.repairBarePlanId }
+      ];
+    }
+
+    function selectedRepair() {
+      return repairLevels().find(level => level.id === state.selectedRepairLevel) || repairLevels()[0];
+    }
+
+    function syncRepairCostFromSelected() {
+      state.repairCost = selectedRepair().price;
+    }
+
+    function futureValue(amount, ratePercent, years) {
+      return amount * Math.pow(1 + (ratePercent / 100), years);
+    }
+
+    function inflatedRepairTotal() {
+      const count = Math.round(state.futureRepairCount);
+      if (!count) return 0;
+      let total = 0;
+      for (let i = 1; i <= count; i += 1) {
+        const year = Math.max(1, Math.round((state.yearsInHome / (count + 1)) * i));
+        total += futureValue(state.futureRepairCost, state.repairInflation, year);
+      }
+      return total;
+    }
+
+    function calc() {
+      const conservativeCoolingPct = Math.max(0, state.coolingPercent - 10);
+      const conservativeHeatingPct = Math.max(0, state.heatingPercent - 10);
+      const coolingMonthly = state.electricBill * conservativeCoolingPct / 100;
+      const heatingBill = state.fuelType === "gas" ? state.gasBill : state.electricBill;
+      const heatingMonthly = heatingBill * conservativeHeatingPct / 100;
+      const currentHvacMonthly = coolingMonthly + heatingMonthly;
+      const currentHvacTotal = currentHvacMonthly * state.yearsInHome * 12;
+      const futureRepairs = inflatedRepairTotal();
+      const futureReplacement = futureValue(state.basicPrice, state.equipmentInflation, state.yearsInHome);
+
+      const options = [
+        replacementOption("best", state.bestLabel, state.bestDescription, state.bestPrice, state.bestSavings),
+        replacementOption("better", state.betterLabel, state.betterDescription, state.betterPrice, state.betterSavings),
+        replacementOption("basic", state.basicLabel, state.basicDescription, state.basicPrice, state.basicSavings)
+      ];
+      if (state.conversationType === "repair") options.push(repairOption());
+
+      function replacementOption(id, label, description, price, savingsPercent) {
+        const asLowAs = payment(price, "replacement");
+        const operatingMonthly = currentHvacMonthly * (1 - savingsPercent / 100);
+        const savingsMonthly = currentHvacMonthly - operatingMonthly;
+        const operatingTotal = operatingMonthly * state.yearsInHome * 12;
+        const trueCost = price + operatingTotal;
+        const netAfterSavings = Math.max(0, (asLowAs || 0) - savingsMonthly);
+        return {
+          id, label, description, price, savingsPercent, asLowAs,
+          operatingMonthly, savingsMonthly, futureRepairs: 0,
+          monthlyView: netAfterSavings,
+          netAfterSavings,
+          trueCost,
+          math: { operatingTotal }
+        };
+      }
+
+    function repairOption() {
+        const repair = selectedRepair();
+        const asLowAs = payment(repair.price, "repair", repair.planId);
+        const futureRepairsMonthly = futureRepairs / (state.yearsInHome * 12);
+        const trueCost = repair.price + futureRepairs + currentHvacTotal + futureReplacement;
+        return {
+          id: "repair",
+          label: state.repairLabel,
+          description: repair.label + ": " + repair.description,
+          price: repair.price,
+          planId: repair.planId,
+          savingsPercent: 0,
+          asLowAs,
+          operatingMonthly: currentHvacMonthly,
+          savingsMonthly: 0,
+          futureRepairs,
+          futureRepairsMonthly,
+          monthlyView: (asLowAs || 0) + futureRepairsMonthly + currentHvacMonthly,
+          trueCost,
+          math: { currentHvacTotal, futureReplacement }
+        };
+      }
+
+      const eligibleMonthly = options.filter(option => option.asLowAs !== null);
+      const bareMinimum = eligibleMonthly.reduce((best, option) => !best || option.asLowAs < best.asLowAs ? option : best, null);
+      const lowestCost = options.reduce((best, option) => !best || option.trueCost < best.trueCost ? option : best, null);
+
+      return {
+        conservativeCoolingPct,
+        conservativeHeatingPct,
+        coolingMonthly,
+        heatingMonthly,
+        currentHvacMonthly,
+        currentHvacTotal,
+        futureRepairs,
+        futureReplacement,
+        bareMinimumId: bareMinimum?.id || "",
+        lowestCostId: lowestCost?.id || "",
+        options
+      };
+    }
+
+    function render() {
+      const data = calc();
+      renderBrand();
+      renderTabs();
+      renderInputs(data);
+      renderCards(data);
+      renderFinance(data);
+      renderPrintSummary(data);
+      save();
+    }
+
+    function renderTabs() {
+      document.querySelectorAll("[data-tab]").forEach(button => {
+        button.setAttribute("aria-selected", button.dataset.tab === activeTab ? "true" : "false");
+      });
+      document.getElementById("detailsTab").classList.toggle("active", activeTab === "details");
+      document.getElementById("operatingTab").classList.toggle("active", activeTab === "operating");
+      document.getElementById("solutionsTab").classList.toggle("active", activeTab === "solutions");
+      document.getElementById("financingTab").classList.toggle("active", activeTab === "financing");
+    }
+
+    function renderBrand() {
+      document.getElementById("brandName").textContent = brand.name || "Atlantic North";
+      document.getElementById("brandLogo").src = brand.logoData || brand.logoUrl || LOGO_FALLBACK;
+      document.querySelectorAll("[data-brand]").forEach(input => {
+        input.value = brand[input.dataset.brand] || "";
+      });
+    }
+
+    function renderInputs(data) {
+      renderPlanSelects();
+      document.querySelectorAll("[data-input]").forEach(input => {
+        const key = input.dataset.input;
+        if (document.activeElement === input && input.type !== "range") return;
+        if (input.type === "range") input.value = state[key];
+        else input.value = state[key] ?? "";
+      });
+
+      document.getElementById("yearsDetailValue").textContent = state.yearsInHome + " yrs";
+      document.getElementById("ownedHomeYearsValue").textContent = state.ownedHomeYears + " yrs";
+      document.getElementById("acAgeValue").textContent = state.acAge + " yrs";
+      document.getElementById("furnaceAgeValue").textContent = state.furnaceAge + " yrs";
+      document.getElementById("maintenanceHistoryNote").textContent = maintenanceHistoryNote(state.maintenanceHistory);
+      document.getElementById("coolingPercentValue").textContent = percent(state.coolingPercent);
+      document.getElementById("heatingPercentValue").textContent = percent(state.heatingPercent);
+      document.getElementById("futureRepairsValue").textContent = Math.round(state.futureRepairCount).toString();
+      document.getElementById("futureRepairCostValue").textContent = money(state.futureRepairCost);
+      document.getElementById("repairInflationValue").textContent = percent(state.repairInflation);
+      document.getElementById("selectedRepairCostValue").textContent = money(selectedRepair().price);
+      document.getElementById("baseFutureRepairsValue").textContent =
+        Math.round(state.futureRepairCount) + " x " + money(state.futureRepairCost) + " = " + money(Math.round(state.futureRepairCount) * state.futureRepairCost);
+      document.getElementById("inflatedFutureRepairsValue").textContent = money(data.futureRepairs);
+      document.getElementById("currentOperatingValue").textContent = money(data.currentHvacMonthly) + "/mo";
+      document.getElementById("currentCoolingUsedValue").textContent = money(data.coolingMonthly) + "/mo";
+      document.getElementById("currentHeatingUsedValue").textContent = money(data.heatingMonthly) + "/mo";
+      document.getElementById("bestSavingsValue").textContent = percent(state.bestSavings);
+      document.getElementById("betterSavingsValue").textContent = percent(state.betterSavings);
+      document.getElementById("basicSavingsValue").textContent = percent(state.basicSavings);
+      document.querySelectorAll(".repair-only").forEach(element => {
+        element.classList.toggle("is-hidden", state.conversationType === "replacement");
+      });
+
+      const climate = climatePresets[state.climateZone] || climatePresets.mixed;
+      const acInstalledSeer = state.acInstalledSeer || estimatedAcInstalledSeer(state.acAge);
+      const acPerformanceLoss = estimatedAcEfficiencyLoss(state.acAge);
+      const furnacePerformanceLoss = estimatedFurnaceEfficiencyLoss(state.furnaceAge);
+      const acCurrentSeer = acInstalledSeer * (1 - acPerformanceLoss / 100);
+      const furnaceCurrentEfficiency = state.furnaceEfficiency * (1 - furnacePerformanceLoss / 100);
+      document.getElementById("operatingAcAgeValue").textContent = state.acAge + " yrs";
+      document.getElementById("operatingFurnaceAgeValue").textContent = state.furnaceAge + " yrs";
+      document.getElementById("operatingCoolingEfficiencyValue").textContent = "about " + oneDecimal(acCurrentSeer) + " SEER equivalent";
+      document.getElementById("operatingHeatingEfficiencyValue").textContent = state.fuelType === "gas" ? "Gas / about " + oneDecimal(furnaceCurrentEfficiency) + "% working estimate" : "Electric";
+      document.getElementById("acInstalledRatingValue").textContent = "about " + oneDecimal(acInstalledSeer) + " SEER";
+      document.getElementById("acPerformanceLossValue").textContent = percent(acPerformanceLoss);
+      document.getElementById("acCurrentPerformanceValue").textContent = "about " + oneDecimal(acCurrentSeer) + " SEER equivalent";
+      document.getElementById("furnaceInstalledRatingValue").textContent = state.fuelType === "gas" ? state.furnaceEfficiency + "% AFUE" : "Electric heat";
+      document.getElementById("furnacePerformanceLossValue").textContent = state.fuelType === "gas" ? percent(furnacePerformanceLoss) : "n/a";
+      document.getElementById("furnaceCurrentPerformanceValue").textContent = state.fuelType === "gas" ? "about " + oneDecimal(furnaceCurrentEfficiency) + "% working estimate" : "Electric heat";
+      const zipEstimate = climateFromZip(state.zipCode);
+      const stateEstimate = stateFromZip(state.zipCode);
+      const locationLabel = stateEstimate ? stateEstimate + " / " + climate.label : climate.label;
+      document.getElementById("zipStateValue").textContent = stateEstimate || "--";
+      document.getElementById("climateNote").textContent =
+        (state.zipCode && zipEstimate
+          ? "ZIP " + state.zipCode + " shows " + locationLabel + ". "
+          : "Choose the closest climate pattern. ") +
+        climate.note + " Planning load hours: about " + climate.coolingHours.toLocaleString() +
+        " cooling hours and " + climate.heatingHours.toLocaleString() +
+        " heating hours per year. These presets are starting points; the sliders below can be adjusted.";
+
+      document.getElementById("efficiencyNote").textContent =
+        "Installed ratings are the system ratings when installed. If the exact rating is unknown, use the age-based estimate as a starting point.";
+      const riskNotes = [];
+      if (state.recentRepairCount > 0) {
+        const repairWord = state.recentRepairCount === 1 ? "repair" : "repairs";
+        riskNotes.push("Recent repair history adds " + state.recentRepairCount + " future " + repairWord + " to the planning estimate.");
+      }
+      if (state.warrantyStatus === "yes") riskNotes.push("Warranty coverage may lower repair exposure while it is active.");
+      if (state.warrantyStatus === "no") riskNotes.push("Out-of-warranty systems carry more owner-paid repair risk.");
+      document.getElementById("repairRiskNote").textContent = riskNotes.join(" ");
+      document.getElementById("repairPlanNote").textContent =
+        "Based on the older side of the system being about " + projectedSystemAge() + " years old by the end of the planning window. After 20 years, the estimate adds repair risk more aggressively. This is not a guarantee.";
+      const coolingContext = climate.coolingHours >= 1800
+        ? "This area usually needs more cooling."
+        : climate.coolingHours <= 800
+          ? "This area usually needs less cooling."
+          : "This area has a moderate cooling season.";
+      const heatingContext = climate.heatingHours >= 2000
+        ? "This area usually needs more heating."
+        : climate.heatingHours <= 1000
+          ? "This area usually needs less heating."
+          : "This area has a moderate heating season.";
+      document.getElementById("coolingNote").textContent =
+        coolingContext + " Estimated cooling: " + money(state.electricBill * state.coolingPercent / 100) + "/mo. To stay conservative, we use " +
+        money(data.coolingMonthly) + "/mo for savings math.";
+      const heatingBill = state.fuelType === "gas" ? state.gasBill : state.electricBill;
+      const heatingSource = state.fuelType === "gas" ? "gas bill" : "electric bill";
+      document.getElementById("heatingNote").textContent =
+        heatingContext + " Estimated heating from the " + heatingSource + ": " + money(heatingBill * state.heatingPercent / 100) +
+        "/mo. To stay conservative, we use " + money(data.heatingMonthly) + "/mo for savings math.";
+    }
+
+    function renderPlanSelects() {
+      renderPlanSelect("repairCompletePlanSelect", "repair", state.repairCompletePlanId);
+      renderPlanSelect("repairRecommendedPlanSelect", "repair", state.repairRecommendedPlanId);
+      renderPlanSelect("repairBarePlanSelect", "repair", state.repairBarePlanId);
+    }
+
+    function renderPlanSelect(id, type, selectedId) {
+      const select = document.getElementById(id);
+      if (!select) return;
+      const html = financingPlans[type].map(plan =>
+        '<option value="' + escapeAttr(plan.id) + '">' + escapeHtml(plan.plan.replace("Service Finance ", "") + " - " + plan.label + " - " + money(plan.min) + " Min") + '</option>'
+      ).join("");
+      if (select.innerHTML !== html) select.innerHTML = html;
+      select.value = selectedId;
+    }
+
+    function renderCards(data) {
+      const optionCards = document.getElementById("optionCards");
+      optionCards.classList.toggle("replacement-only", state.conversationType === "replacement");
+      optionCards.innerHTML = data.options.map(option => {
+        const isOpen = !!state.openCards[option.id];
+        const isReplacement = option.id !== "repair";
+        const financeRule = selectedFinancingPlan(isReplacement ? "replacement" : "repair", option.planId);
+        const showCashRepair = option.id === "repair" && option.asLowAs === null;
+        const paymentHeading = showCashRepair ? "Repair price" : "As low as";
+        const paymentLabel = showCashRepair ? money(option.price) : option.asLowAs === null ? "Below plan minimum" : money(option.asLowAs) + '<span>/mo</span>';
+        const minText = showCashRepair ? "Below financing minimum" : option.asLowAs === null ? "Minimum financed amount " + money(financeRule.min) : financeRule.label;
+        const repairSelector = option.id === "repair" ? renderRepairSelector() : "";
+        const monthlyRows = isReplacement ? "" : line("Future repairs averaged monthly", money(option.futureRepairsMonthly) + "/mo");
+        const badges = [
+          option.id === data.lowestCostId ? '<span class="badge cost">Lowest estimated cost</span>' : '',
+          option.id === data.bareMinimumId ? '<span class="badge monthly">Lowest payment shown</span>' : ''
+        ].join("");
+
+        return '<article class="option-card ' + escapeAttr(option.id) + (isOpen ? ' open' : '') + '">' +
+          '<div class="card-main">' +
+            '<div class="badges">' + badges + '</div>' +
+            '<div class="option-title"><h2>' + escapeHtml(option.label) + '</h2></div>' +
+            '<p class="description">' + escapeHtml(option.description) + '</p>' +
+            repairSelector +
+            '<div class="payment-block">' +
+              '<span class="payment-label">' + escapeHtml(paymentHeading) + '</span>' +
+              '<strong class="payment-value">' + paymentLabel + '</strong>' +
+              '<span class="note" style="color:#cfe4ed;">' + escapeHtml(minText) + '</span>' +
+            '</div>' +
+            (monthlyRows ? '<div class="monthly-view">' +
+              monthlyRows +
+            '</div>' : '') +
+            '<div class="card-actions">' +
+              '<button class="btn soft small" type="button" data-toggle-card="' + escapeAttr(option.id) + '">' + (isOpen ? 'Hide math' : 'Show math') + '</button>' +
+            '</div>' +
+          '</div>' +
+          '<div class="math">' + renderMath(option, data, isReplacement) + '</div>' +
+        '</article>';
+      }).join("");
+    }
+
+    function renderRepairSelector() {
+      return '<div class="repair-levels" aria-label="Repair options">' + repairLevels().map(level =>
+        '<button type="button" data-repair-level="' + escapeAttr(level.id) + '" aria-pressed="' + (state.selectedRepairLevel === level.id ? "true" : "false") + '">' +
+          '<span>' + escapeHtml(level.label) + '</span>' +
+          '<small>' + money(level.price) + '</small>' +
+        '</button>'
+      ).join("") + '</div>';
+    }
+
+    function renderFinance(data) {
+      document.getElementById("fieldFinanceTopLink").href = FIELD_FINANCING_URL;
+      document.getElementById("fieldFinanceBottomLink").href = FIELD_FINANCING_URL;
+      document.getElementById("paymentPlanNote").textContent =
+        state.conversationType === "repair"
+          ? "Each repair row uses the payment option selected under that repair. Replacement rows stay on " + selectedFinancingPlan("replacement").plan + "."
+          : "Replacement rows stay on " + selectedFinancingPlan("replacement").plan + ". Repair options are hidden for this conversation.";
+      const replacementOptions = data.options
+        .filter(option => option.id !== "repair")
+        .map(option => ({ ...option, type: "replacement" }));
+      const repairOptions = repairLevels().map(level => ({
+        id: "repair-" + level.id,
+        label: level.label,
+        price: level.price,
+        description: level.description,
+        asLowAs: payment(level.price, "repair", level.planId),
+        planId: level.planId,
+        type: "repair",
+        selected: level.id === state.selectedRepairLevel
+      }));
+      document.getElementById("financeCards").innerHTML =
+        (state.conversationType === "repair" ? financeSection("Repair Financing", "repair", repairOptions) : "") +
+        financeSection("Replacement Financing", "replacement", replacementOptions);
+    }
+
+    function financeSection(title, type, options) {
+      return '<section class="finance-section ' + escapeAttr(type) + '">' +
+        '<h3>' + escapeHtml(title) + '</h3>' +
+        options.map(option => financeRow(option)).join("") +
+      '</section>';
+    }
+
+    function financeRow(option) {
+        const isRepair = option.type === "repair";
+        const rule = selectedFinancingPlan(isRepair ? "repair" : "replacement", option.planId);
+        const eligible = option.asLowAs !== null;
+        const paymentText = eligible ? money(option.asLowAs) + "/mo" : money(option.price);
+        const paymentLabel = eligible ? "As low as" : "Cash price";
+        const planText = rule.plan + " / " + rule.label + " / min " + money(rule.min);
+        return '<div class="finance-row">' +
+          '<div class="finance-name"><strong>' + escapeHtml(option.label) + '</strong><span>' + escapeHtml(option.description || "") + '</span></div>' +
+          '<div class="finance-value"><span>' + escapeHtml(paymentLabel) + '</span><strong>' + escapeHtml(paymentText) + '</strong></div>' +
+          '<div class="finance-value"><span>Amount</span><strong>' + money(option.price) + '</strong></div>' +
+          '<div class="finance-plan">' + escapeHtml(planText) + '</div>' +
+          '<button class="btn soft small" type="button" data-copy-amount="' + escapeAttr(String(Math.round(option.price))) + '">Copy</button>' +
+        '</div>';
+    }
+
+    function renderPrintSummary(data) {
+      const acPerformanceLoss = estimatedAcEfficiencyLoss(state.acAge);
+      const furnacePerformanceLoss = estimatedFurnaceEfficiencyLoss(state.furnaceAge);
+      const acCurrentSeer = state.acInstalledSeer * (1 - acPerformanceLoss / 100);
+      const furnaceCurrentEfficiency = state.furnaceEfficiency * (1 - furnacePerformanceLoss / 100);
+      const optionsRows = data.options.map(option => {
+        const paymentText = option.asLowAs === null ? "Below plan minimum" : money(option.asLowAs) + "/mo";
+        const amountLabel = option.id === "repair" ? "Repair price" : "Installed price";
+        const note = option.id === "repair"
+          ? "Future repairs averaged " + money(option.futureRepairsMonthly) + "/mo"
+          : "Estimated utility savings " + money(option.savingsMonthly) + "/mo";
+        return '<tr>' +
+          '<td><strong>' + escapeHtml(option.label) + '</strong><br><span class="print-small">' + escapeHtml(option.description) + '</span></td>' +
+          '<td>' + escapeHtml(amountLabel) + '<br><strong>' + money(option.price) + '</strong></td>' +
+          '<td>As low as<br><strong>' + escapeHtml(paymentText) + '</strong></td>' +
+          '<td><span class="print-small">' + escapeHtml(note) + '</span></td>' +
+        '</tr>';
+      }).join("");
+      const repairLine = state.conversationType === "repair"
+        ? '<div class="row"><span>Current repair</span><strong>' + escapeHtml(selectedRepair().label + " / " + money(selectedRepair().price)) + '</strong></div>'
+        : '<div class="row"><span>Conversation type</span><strong>Replacement options only</strong></div>';
+
+      document.getElementById("printSummary").innerHTML =
+        '<div class="print-head">' +
+          '<div class="print-brand">' +
+            '<img src="' + escapeAttr(brand.logoData || brand.logoUrl || LOGO_FALLBACK) + '" alt="">' +
+            '<div><p class="print-small">' + escapeHtml(brand.name || "Atlantic North") + '</p><h2>HVAC System Cost Review</h2></div>' +
+          '</div>' +
+          '<p class="print-small">Prepared ' + new Date().toLocaleDateString() + '</p>' +
+        '</div>' +
+        '<div class="print-grid">' +
+          '<section class="print-card"><h3>What We Found</h3>' +
+            '<p><strong>Called for:</strong> ' + escapeHtml(state.calledFor) + '</p>' +
+            '<p><strong>Found:</strong> ' + escapeHtml(state.foundIssue) + '</p>' +
+            '<p><strong>Why it matters:</strong> ' + escapeHtml(state.whyItMatters) + '</p>' +
+          '</section>' +
+          '<section class="print-card"><h3>Planning Snapshot</h3>' +
+            '<div class="row"><span>A/C age</span><strong>' + state.acAge + ' yrs</strong></div>' +
+            '<div class="row"><span>Furnace age</span><strong>' + state.furnaceAge + ' yrs</strong></div>' +
+            '<div class="row"><span>Planning to stay</span><strong>' + state.yearsInHome + ' yrs</strong></div>' +
+            repairLine +
+          '</section>' +
+        '</div>' +
+        '<section class="print-card"><h3>System And Operating Cost</h3>' +
+          '<div class="print-grid">' +
+            '<div>' +
+              '<div class="row"><span>A/C installed rating</span><strong>' + oneDecimal(state.acInstalledSeer) + ' SEER</strong></div>' +
+              '<div class="row"><span>A/C working estimate</span><strong>about ' + oneDecimal(acCurrentSeer) + ' SEER equivalent</strong></div>' +
+              '<div class="row"><span>Furnace installed rating</span><strong>' + (state.fuelType === "gas" ? state.furnaceEfficiency + "% AFUE" : "Electric heat") + '</strong></div>' +
+              '<div class="row"><span>Furnace working estimate</span><strong>' + (state.fuelType === "gas" ? "about " + oneDecimal(furnaceCurrentEfficiency) + "%" : "Electric heat") + '</strong></div>' +
+            '</div>' +
+            '<div>' +
+              '<div class="row"><span>Estimated HVAC utility</span><strong>' + money(data.currentHvacMonthly) + '/mo</strong></div>' +
+              '<div class="row"><span>Cooling used</span><strong>' + money(data.coolingMonthly) + '/mo</strong></div>' +
+              '<div class="row"><span>Heating used</span><strong>' + money(data.heatingMonthly) + '/mo</strong></div>' +
+              '<p class="print-small">Utility figures are conservative planning estimates, not guaranteed savings.</p>' +
+            '</div>' +
+          '</div>' +
+        '</section>' +
+        '<section class="print-card"><h3>Options Reviewed</h3>' +
+          '<table class="print-table"><thead><tr><th>Option</th><th>Amount</th><th>Payment</th><th>Planning note</th></tr></thead><tbody>' + optionsRows + '</tbody></table>' +
+        '</section>' +
+        '<p class="print-small">This review is for planning and transparency. Actual utility use, repair timing, approval, and payment terms may vary.</p>';
+    }
+
+    function renderMath(option, data, isReplacement) {
+      if (isReplacement) {
+        return '<div class="math-box">' +
+          '<h3>Payment math</h3>' +
+          line("Installed price", money(option.price)) +
+          line("As-low-as payment", option.asLowAs === null ? "Below plan minimum" : money(option.asLowAs) + "/mo") +
+          line("Estimated HVAC utility savings", money(option.savingsMonthly) + "/mo") +
+          line("Payment minus estimated savings", money(option.netAfterSavings) + "/mo") +
+        '</div>';
+      }
+
+      return '<div class="math-box">' +
+        '<h3>Repair math</h3>' +
+        line("Repair level", selectedRepair().label) +
+        line("Repair price", money(option.price)) +
+        line("Repair financing", option.asLowAs === null ? "Below " + money(selectedFinancingPlan("repair", option.planId).min) + " minimum" : money(option.asLowAs) + "/mo") +
+        line("Future repairs averaged monthly", money(option.futureRepairsMonthly) + "/mo") +
+      '</div>';
+    }
+
+    function line(label, value) {
+      return '<div class="row"><span>' + escapeHtml(label) + '</span><strong>' + escapeHtml(value) + '</strong></div>';
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      }[char]));
+    }
+
+    function escapeAttr(value) {
+      return escapeHtml(value);
+    }
+
+    function notify(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(notify.timer);
+      notify.timer = setTimeout(() => toast.classList.remove("show"), 1800);
+    }
+
+    document.addEventListener("input", event => {
+      const input = event.target.closest("[data-input]");
+      if (input) {
+        const key = input.dataset.input;
+        const value = input.type === "range" ? Number(input.value) : input.value;
+        const previousAcEstimate = estimatedAcInstalledSeer(state.acAge);
+        state[key] = typeof defaults[key] === "number" ? cleanNumber(value) : value;
+        if (key === "acAge" && oneDecimal(state.acInstalledSeer) === oneDecimal(previousAcEstimate)) {
+          state.acInstalledSeer = estimatedAcInstalledSeer(value);
+        }
+        state = normalize(state);
+        if (key === "acAge" || key === "furnaceAge" || key === "yearsInHome" || key === "recentRepairCount") {
+          const next = projectedRepairPlan();
+          if (next) {
+            state.futureRepairCount = next.repairs;
+            state.futureRepairCost = Math.max(next.cost, selectedRepair().price);
+          }
+        }
+        if (key.startsWith("repair") || key === "selectedRepairLevel") {
+          syncRepairCostFromSelected();
+        }
+        if (state.futureRepairCost < selectedRepair().price) {
+          state.futureRepairCost = selectedRepair().price;
+        }
+        if (key === "zipCode") {
+          const estimated = climateFromZip(state.zipCode);
+          if (estimated) applyClimatePreset(estimated);
+        }
+        if (key === "climateZone") {
+          applyClimatePreset(state.climateZone);
+        }
+        render();
+        return;
+      }
+
+      const brandInput = event.target.closest("[data-brand]");
+      if (brandInput) {
+        brand[brandInput.dataset.brand] = brandInput.value;
+        saveBrand();
+        renderBrand();
+      }
+    });
+
+    document.addEventListener("click", event => {
+      const repairLevel = event.target.closest("[data-repair-level]");
+      if (repairLevel) {
+        state.selectedRepairLevel = repairLevel.dataset.repairLevel;
+        syncRepairCostFromSelected();
+        save();
+        render();
+        return;
+      }
+
+      const toggle = event.target.closest("[data-toggle-card]");
+      if (toggle) {
+        const id = toggle.dataset.toggleCard;
+        state.openCards[id] = !state.openCards[id];
+        save();
+        render();
+        return;
+      }
+
+      const copyAmount = event.target.closest("[data-copy-amount]");
+      if (copyAmount) {
+        const amount = copyAmount.dataset.copyAmount;
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(amount).then(() => notify("Amount copied."));
+        } else {
+          window.prompt("Copy amount:", amount);
+        }
+      }
+
+      const scenarioButton = event.target.closest("[data-scenario]");
+      if (scenarioButton) {
+        const scenario = scenarios[scenarioButton.dataset.scenario];
+        if (!scenario) return;
+        state = normalize({ ...state, ...scenario });
+        syncRepairCostFromSelected();
+        save();
+        render();
+        notify("Testing preset loaded.");
+      }
+    });
+
+    document.getElementById("brandBtn").addEventListener("click", () => {
+      document.getElementById("brandDrawer").classList.toggle("open");
+    });
+
+    document.addEventListener("click", event => {
+      const tabButton = event.target.closest("[data-tab]");
+      const tabJump = event.target.closest("[data-tab-jump]");
+      const nextTab = tabButton?.dataset.tab || tabJump?.dataset.tabJump;
+      if (!nextTab) return;
+      activeTab = nextTab;
+      renderTabs();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      state = clone(defaults);
+      activeTab = "details";
+      save();
+      render();
+      notify("Homeowner numbers reset. Brand kept.");
+    });
+
+    document.getElementById("chooseLogoBtn").addEventListener("click", () => {
+      document.getElementById("logoFile").click();
+    });
+
+    document.getElementById("clearLogoBtn").addEventListener("click", () => {
+      brand.logoData = "";
+      brand.logoUrl = brand.logoUrl || LOGO_FALLBACK;
+      saveBrand();
+      renderBrand();
+      notify("Local logo cleared.");
+    });
+
+    document.getElementById("logoFile").addEventListener("change", event => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        brand.logoData = String(reader.result || "");
+        saveBrand();
+        renderBrand();
+        notify("Logo saved in this browser.");
+      };
+      reader.readAsDataURL(file);
+      event.target.value = "";
+    });
+
+    document.getElementById("printBtn").addEventListener("click", () => {
+      renderPrintSummary(calc());
+      window.print();
+    });
+
+    document.getElementById("copySummaryBtn").addEventListener("click", async () => {
+      const data = calc();
+      const lines = data.options.map(option => {
+        const isReplacement = option.id !== "repair";
+        const paymentText = option.asLowAs === null ? money(option.price) : money(option.asLowAs) + "/mo";
+        const monthlyText = isReplacement
+          ? ""
+          : ", future repairs averaged " + money(option.futureRepairsMonthly) + "/mo";
+        return option.label + ": " + paymentText + monthlyText;
+      });
+      const findings = [
+        "What you called for: " + state.calledFor,
+        "What we found: " + state.foundIssue,
+        "Why it matters: " + state.whyItMatters,
+        "Options below: " + state.nextStepSummary
+      ];
+      if (state.conversationType === "repair") {
+        findings.push("Current repair: " + selectedRepair().label + " at " + money(selectedRepair().price));
+      }
+      const summary = "HVAC System Cost Review Summary\n" + findings.join("\n") + "\n\n" + lines.join("\n");
+      try {
+        await navigator.clipboard.writeText(summary);
+        notify("Summary copied.");
+      } catch {
+        window.prompt("Copy summary:", summary);
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>
